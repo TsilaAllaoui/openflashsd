@@ -1,5 +1,5 @@
-#ifndef PACKET_MANAGER_H
-#define PACKET_MANAGER_H
+#ifndef PACKET_REQUEST_SENDER_H
+#define PACKET_REQUEST_SENDER_H
 
 #include "protocol.h"
 
@@ -7,7 +7,7 @@ namespace openflash
 {
     namespace esp32
     {
-        class packet_manager
+        class request_sender
         {
         private:
             uint8_t get_current_sequence_number();

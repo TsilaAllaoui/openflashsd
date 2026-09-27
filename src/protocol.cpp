@@ -32,10 +32,16 @@ namespace openflash
             if (bytes.size() < minimum_packet_size)
                 return std::nullopt;
 
-            if (bytes[0] != 'O' || bytes[1] != 'F')
+            if (bytes[0] != magic_0 || bytes[1] != magic_1)
+                return std::nullopt;
+
+            if (bytes[2] != current_protocol_version)
                 return std::nullopt;
 
             uint16_t payload_size = static_cast<uint16_t>(bytes[5]) | (static_cast<uint16_t>(bytes[6]) << 8);
+
+            if (payload_size > max_payload_size)
+                return std::nullopt;
 
             size_t expected_size = header_size + payload_size + crc_size;
 
@@ -57,7 +63,6 @@ namespace openflash
             result.protocol_version = bytes[2];
             result.sequence_number = bytes[3];
             result.cmd = static_cast<command>(bytes[4]);
-            result.crc16 = received_crc;
 
             result.payload.assign(bytes.begin() + header_size, bytes.begin() + header_size + payload_size);
 
@@ -66,7 +71,8 @@ namespace openflash
 
         std::vector<uint8_t> serialize(const protocol &protocol_)
         {
-            if (!is_command_supported(protocol_.cmd))
+            // limit serialization load
+            if (protocol_.payload.size() > max_payload_size)
                 return {};
 
             // only ping for now
@@ -77,7 +83,7 @@ namespace openflash
             packet.emplace_back(magic_1);
 
             // protocol version
-            packet.emplace_back(1);
+            packet.emplace_back(protocol_.protocol_version);
 
             // sequence number
             packet.emplace_back(protocol_.sequence_number);
@@ -88,8 +94,8 @@ namespace openflash
             // payload
             packet.emplace_back(protocol_.payload.size() & 0xFF);
             packet.emplace_back(protocol_.payload.size() >> 8);
-            for (int i = 0; i < protocol_.payload.size(); i++)
-                packet.emplace_back(protocol_.payload[i]);
+            for (const auto &byte : protocol_.payload)
+                packet.emplace_back(byte);
 
             // CRC16
             auto crc16 = calculate_crc16(packet.data(), packet.size());
@@ -129,55 +135,16 @@ namespace openflash
             {
                 case status::ERROR:
                     return "Error occured";
-                    break;
                 case status::INVALID_COMMAND:
                     return "Invalid command";
-                    break;
                 case status::INVALID_PAYLOAD:
                     return "Invalid payload";
-                    break;
                 case status::NOT_FOUND:
                     return "Not found";
-                    break;
                 case status::NOT_READY:
                     return "Not ready";
-                    break;
                 case status::OK:
                     return "OK";
-                    break;
-
-                default:
-                    return "Unhandled status";
-            }
-        }
-
-        std::string status_to_string(const std::vector<uint8_t> &bytes)
-        {
-            if (bytes.size() < header_size)
-                return "ERROR";
-
-            auto status_ = static_cast<status>(bytes[header_size]);
-
-            switch (status_)
-            {
-                case status::ERROR:
-                    return "Error occured";
-                    break;
-                case status::INVALID_COMMAND:
-                    return "Invalid command";
-                    break;
-                case status::INVALID_PAYLOAD:
-                    return "Invalid payload";
-                    break;
-                case status::NOT_FOUND:
-                    return "Not found";
-                    break;
-                case status::NOT_READY:
-                    return "Not ready";
-                    break;
-                case status::OK:
-                    return "OK";
-                    break;
 
                 default:
                     return "Unhandled status";

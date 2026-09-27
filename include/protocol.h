@@ -25,10 +25,11 @@ namespace openflash
 
         constexpr uint8_t magic_0 = 'O';
         constexpr uint8_t magic_1 = 'F';
-
         constexpr size_t header_size = 7;
         constexpr size_t crc_size = 2;
         constexpr size_t minimum_packet_size = header_size + crc_size;
+        constexpr size_t max_payload_size = 1024;
+        constexpr uint8_t current_protocol_version = 1;
 
         enum class command : uint8_t
         {
@@ -54,18 +55,15 @@ namespace openflash
 
         struct protocol
         {
-            uint8_t protocol_version = 1;
+            uint8_t protocol_version = current_protocol_version;
             uint8_t sequence_number = 0;
             command cmd = command::PING;
             std::vector<uint8_t> payload;
-            uint16_t crc16 = 0;
         };
 
         bool is_command_supported(const command &command_);
         uint16_t calculate_crc16(const uint8_t *data, size_t size);
         std::string status_to_string(const status &status_);
-        std::string status_to_string(const std::vector<uint8_t> &bytes);
-
         std::optional<protocol> deserialize(const std::vector<uint8_t> &bytes);
         std::vector<uint8_t> serialize(const protocol &protocol_);
     }

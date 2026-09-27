@@ -1,5 +1,5 @@
 #include "protocol.h"
-#include "packet_responder.h"
+#include "request_handler.h"
 
 #include <iostream>
 
@@ -7,28 +7,37 @@ namespace openflash
 {
     namespace esp32
     {
-        std::vector<uint8_t> packet_responder::receive(const std::vector<uint8_t> &bytes)
+        protocol request_handler::handle(const protocol &request)
         {
-            std::vector<uint8_t> response;
+            protocol response;
 
-            auto parsed_protocol = deserialize(bytes);
+            response.protocol_version = current_protocol_version;
+            response.sequence_number = request.sequence_number;
+            response.cmd = request.cmd;
 
-            if (!parsed_protocol)
+            switch (request.cmd)
             {
-                std::cout << "Log: Error parsing bytes for protocol!\n";
-                return {};
-            }
-            else
-            {
-                if (parsed_protocol->cmd == command::PING)
+                case command::PING:
                 {
-                    parsed_protocol->payload.emplace(parsed_protocol->payload.begin(),
-                                                     static_cast<uint8_t>(status::OK));
+                    if (!request.payload.empty())
+                    {
+                        response.payload.emplace_back(static_cast<uint8_t>(status::INVALID_PAYLOAD));
+                    }
+                    else
+                    {
+                        response.payload.emplace_back(static_cast<uint8_t>(status::OK));
+                    }
+                    break;
                 }
-                // do other types here
+
+                default:
+                {
+                    response.payload.emplace_back(static_cast<uint8_t>(status::INVALID_COMMAND));
+                    break;
+                }
             }
 
-            return serialize(*parsed_protocol);
+            return response;
         }
     }
 }
