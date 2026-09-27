@@ -471,7 +471,7 @@ bool test_pings_round_trips_with_timeout()
     // suppose first request is sent and it succeed and got responded correctly
     // then second request got timeout so it fail and got ignored
     // then third request is sent and it succeed and got responded correctly
-    for (int i = 0; i < requests_bytes_list.size(); i++)
+    for (size_t i = 0; i < requests_bytes_list.size(); i++)
     {
         auto request_bytes = requests_bytes_list[i];
         if (request_bytes.empty())

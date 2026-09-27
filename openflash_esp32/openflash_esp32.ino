@@ -1,0 +1,33 @@
+#include <Arduino.h>
+
+#include "src/packet_stream_parser.h"
+#include "src/request_handler.h"
+
+using namespace openflash::esp32;
+
+packet_stream_parser parser;
+request_handler handler;
+
+void setup()
+{
+    Serial.begin(115200);
+}
+
+void loop()
+{
+    while (Serial.available() > 0)
+    {
+        uint8_t byte = static_cast<uint8_t>(Serial.read());
+
+        auto request = parser.push_packet(byte);
+
+        if (!request)
+            continue;
+
+        auto response = handler.handle(*request);
+
+        auto bytes = serialize(response);
+
+        Serial.write(bytes.data(), bytes.size());
+    }
+}
