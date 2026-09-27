@@ -1,16 +1,21 @@
 #include <Arduino.h>
 
+#include "src/drivers/sd_filesystem.h"
 #include "src/packet_stream_parser.h"
 #include "src/request_handler.h"
 
 using namespace openflash::esp32;
 
 packet_stream_parser parser;
-request_handler handler;
+
+sd_filesystem filesystem;
+request_handler handler(filesystem);
 
 void setup()
 {
     Serial.begin(115200);
+
+    filesystem.begin();
 }
 
 void loop()
