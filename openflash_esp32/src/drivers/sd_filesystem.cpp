@@ -3,6 +3,8 @@
 #include <SD.h>
 #include <SPI.h>
 
+#include <filesystem>
+
 #include "../protocol.h"
 #include "sd_filesystem.h"
 #include "../interfaces/file_entry.h"
@@ -17,16 +19,16 @@ namespace openflash
         constexpr int SD_CS = 10;
         constexpr uint32_t SD_BOOTSTRAP_FREQUENCY = 8000000;
 
-        file_type sd_filesystem::get_file_type(File file)
+        file_type sd_filesystem::get_file_type(const std::string &path, bool is_directory)
         {
-            String fileName = file.name();
-
-            if (fileName.endsWith(".gba"))
-                return file_type::GBA_FILE;
-            else if (fileName.endsWith(".sav"))
-                return file_type::SAVE_FILE;
-            else if (file.isDirectory())
+            if (is_directory)
                 return file_type::FOLDER;
+
+            if (path.size() >= 4 && path.compare(path.size() - 4, 4, ".gba") == 0)
+                return file_type::GBA_FILE;
+
+            if (path.size() >= 4 && path.compare(path.size() - 4, 4, ".sav") == 0)
+                return file_type::SAVE_FILE;
 
             return file_type::NORMAL_FILE;
         }
@@ -135,18 +137,23 @@ namespace openflash
                 return false;
             }
 
-            File file = root.openNextFile();
-
-            while (file)
+            while (true)
             {
-                file_entry entry;
-                entry.path = file.name();
-                entry.type = get_file_type(file);
-                entry.size = file.isDirectory() ? 0 : static_cast<uint32_t>(file.size());
-                entries.emplace_back(entry);
+                bool is_directory = false;
+                String full_path = root.getNextFileName(&is_directory);
 
-                file.close();
-                file = root.openNextFile();
+                if (full_path.length() == 0)
+                    break;
+
+                int separator = full_path.lastIndexOf('/');
+                String file_name = separator >= 0 ? full_path.substring(separator + 1) : full_path;
+
+                file_entry entry;
+                entry.path = file_name.c_str();
+                entry.type = get_file_type(entry.path, is_directory);
+                entry.size =
+                    0; // For now it's the bottleneck wo we will not use file size here, only in lazy loaiding or for only one file
+                entries.emplace_back(std::move(entry));
             }
 
             root.close();

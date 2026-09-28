@@ -151,7 +151,8 @@ namespace openflash
                 const auto &file = files[i];
                 const size_t current_entry_size = file_entry_minimal_size + file.path.size();
 
-                if (file_count > 0 && file_list_header_size + estimated_size + current_entry_size > config.max_payload_size)
+                if (file_count > 0
+                    && file_list_header_size + estimated_size + current_entry_size > config.max_payload_size)
                 {
                     current_response.insert(current_response.begin(), static_cast<uint8_t>(status::NOT_FINISHED_YET));
                     current_response.insert(current_response.begin() + 1, estimated_size & 0xFF);

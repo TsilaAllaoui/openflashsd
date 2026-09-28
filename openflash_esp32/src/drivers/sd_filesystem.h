@@ -12,7 +12,7 @@ namespace openflash
         {
         private:
             bool _ready = false;
-            file_type get_file_type(File file);
+            file_type get_file_type(const std::string &path, bool is_directory);
 
         public:
             bool begin();
