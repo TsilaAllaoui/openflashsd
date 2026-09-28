@@ -11,6 +11,7 @@ namespace openflash
         bool read_u16(const std::vector<uint8_t> &payload, size_t &offset, uint16_t &value);
         bool read_string(const std::vector<uint8_t> &payload, size_t &offset, std::string &value);
         void append_u32(std::vector<uint8_t> &payload, uint32_t value);
+        bool read_u32(const std::vector<uint8_t> &payload, size_t &offset, uint32_t &value);
     }
 }
 

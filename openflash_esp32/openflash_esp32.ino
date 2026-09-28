@@ -7,14 +7,12 @@
 using namespace openflash::esp32;
 
 packet_stream_parser parser;
-
 sd_filesystem filesystem;
 request_handler handler(filesystem);
 
 void setup()
 {
     Serial.begin(115200);
-
     filesystem.begin();
 }
 
@@ -23,16 +21,19 @@ void loop()
     while (Serial.available() > 0)
     {
         uint8_t byte = static_cast<uint8_t>(Serial.read());
-
         auto request = parser.push_packet(byte);
 
         if (!request)
             continue;
 
-        auto response = handler.handle(*request);
+        auto responses = handler.handle(*request);
 
-        auto bytes = serialize(response);
+        for (const auto &response : responses)
+        {
+            auto bytes = serialize(response);
 
-        Serial.write(bytes.data(), bytes.size());
+            if (!bytes.empty())
+                Serial.write(bytes.data(), bytes.size());
+        }
     }
 }

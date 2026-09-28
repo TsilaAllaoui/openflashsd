@@ -3,6 +3,7 @@
 #include <SD.h>
 #include <SPI.h>
 
+#include "../protocol.h"
 #include "sd_filesystem.h"
 #include "../interfaces/file_entry.h"
 
@@ -14,6 +15,7 @@ namespace openflash
         constexpr int SD_MISO = 1;
         constexpr int SD_MOSI = 3;
         constexpr int SD_CS = 10;
+        constexpr uint32_t SD_BOOTSTRAP_FREQUENCY = 8000000;
 
         file_type sd_filesystem::get_file_type(File file)
         {
@@ -25,19 +27,83 @@ namespace openflash
                 return file_type::SAVE_FILE;
             else if (file.isDirectory())
                 return file_type::FOLDER;
+
             return file_type::NORMAL_FILE;
+        }
+
+        bool load_config(const char *path)
+        {
+            File file = SD.open(path, FILE_READ);
+
+            if (!file)
+                return false;
+
+            while (file.available())
+            {
+                String line = file.readStringUntil('\n');
+                line.trim();
+
+                if (line.length() == 0 || line.startsWith("#"))
+                    continue;
+
+                int separator = line.indexOf('=');
+
+                if (separator < 0)
+                    continue;
+
+                String key = line.substring(0, separator);
+                String value = line.substring(separator + 1);
+
+                key.trim();
+                value.trim();
+
+                if (key == "max_payload_size")
+                {
+                    const long parsed_value = value.toInt();
+
+                    if (parsed_value > 0 && parsed_value <= UINT16_MAX)
+                        config.max_payload_size = static_cast<uint32_t>(parsed_value);
+                }
+                else if (key == "max_sd_frequency")
+                {
+                    const long parsed_value = value.toInt();
+
+                    if (parsed_value > 0)
+                        config.max_sd_frequency = static_cast<uint32_t>(parsed_value);
+                }
+            }
+
+            file.close();
+            return true;
         }
 
         bool sd_filesystem::begin()
         {
             SPI.begin(SD_SCK, SD_MISO, SD_MOSI, SD_CS);
 
-            _ready = SD.begin(SD_CS, SPI, 10000000);
+            _ready = SD.begin(SD_CS, SPI, SD_BOOTSTRAP_FREQUENCY);
 
             if (!_ready)
                 return false;
 
             if (SD.cardType() == CARD_NONE)
+            {
+                _ready = false;
+                return false;
+            }
+
+            load_config("/openflash.cfg");
+
+            if (config.max_sd_frequency != SD_BOOTSTRAP_FREQUENCY)
+            {
+                SD.end();
+                _ready = SD.begin(SD_CS, SPI, config.max_sd_frequency);
+
+                if (!_ready)
+                    _ready = SD.begin(SD_CS, SPI, SD_BOOTSTRAP_FREQUENCY);
+            }
+
+            if (!_ready || SD.cardType() == CARD_NONE)
             {
                 _ready = false;
                 return false;
@@ -74,16 +140,16 @@ namespace openflash
             while (file)
             {
                 file_entry entry;
-                entry.path = file.path();
+                entry.path = file.name();
                 entry.type = get_file_type(file);
                 entry.size = file.isDirectory() ? 0 : static_cast<uint32_t>(file.size());
                 entries.emplace_back(entry);
+
                 file.close();
                 file = root.openNextFile();
             }
 
             root.close();
-
             return true;
         }
     }

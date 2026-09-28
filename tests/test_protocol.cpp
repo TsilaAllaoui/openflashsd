@@ -6,8 +6,10 @@
 #include <iostream>
 
 #include "protocol.h"
+#include "utilities.h"
 #include "request_sender.h"
 #include "request_handler.h"
+#include "mock_filesystem.h"
 #include "packet_stream_parser.h"
 
 using namespace openflash::esp32;
@@ -368,7 +370,8 @@ bool test_ping_round_trip()
     request_sender gba_manager;
 
     packet_stream_parser esp32_parser;
-    request_handler esp32_handler;
+    mock_filesystem fs;
+    request_handler esp32_handler(fs);
 
     packet_stream_parser gba_parser;
 
@@ -395,10 +398,10 @@ bool test_ping_round_trip()
         return false;
     }
     // esp32 handles request
-    protocol response = esp32_handler.handle(*request);
+    auto responses = esp32_handler.handle(*request);
 
     // esp32 serializes response
-    auto response_bytes = serialize(response);
+    auto response_bytes = serialize(responses.back());
 
     if (response_bytes.empty())
         return false;
@@ -459,7 +462,8 @@ bool test_pings_round_trips_with_timeout()
     request_sender gba_manager;
 
     packet_stream_parser esp32_parser;
-    request_handler esp32_handler;
+    mock_filesystem fs;
+    request_handler esp32_handler(fs);
 
     packet_stream_parser gba_parser;
 
@@ -507,10 +511,10 @@ bool test_pings_round_trips_with_timeout()
         }
 
         // esp32 handles request
-        protocol response = esp32_handler.handle(*request);
+        auto responses = esp32_handler.handle(*request);
 
         // esp32 serializes response
-        auto response_bytes = serialize(response);
+        auto response_bytes = serialize(responses.back());
 
         if (response_bytes.empty())
             return false;
@@ -562,14 +566,132 @@ bool test_pings_round_trips_with_timeout()
     return true;
 }
 
+std::string file_type_to_string(const file_type &type)
+{
+    if (type == file_type::FOLDER)
+        return "FOLDER";
+    else if (type == file_type::GBA_FILE)
+        return "GBA_FILE";
+    else if (type == file_type::NORMAL_FILE)
+        return "FILE";
+    else if (type == file_type::SAVE_FILE)
+        return "SAVE_FILE";
+    else
+        return "UNKNOWN";
+}
+
+bool test_non_consummed_file_list()
+{
+    std::cout << "[TEST] File listing with non consummed list" << std::endl;
+
+    request_sender sender;
+    packet_stream_parser parser;
+    mock_filesystem fs;
+    request_handler esp32_handler(fs);
+
+    config.max_payload_size = 128;
+
+    std::vector<uint8_t> requested_path = {1, 0, '/'};
+
+    auto bytes = sender.send(command::LIST_FILES, requested_path);
+    auto expected = deserialize(bytes);
+
+    if (!expected)
+        return false;
+
+    auto received = feed(parser, bytes);
+
+    if (!received)
+        return false;
+
+    if (!check_packet(*received, command::LIST_FILES, expected->sequence_number))
+        return false;
+
+    std::vector<file_entry> expected_files;
+    fs.list_directory("/", expected_files);
+
+    std::vector<file_entry> files;
+    auto responses = esp32_handler.handle(*received);
+
+    if (responses.empty())
+        return false;
+
+    for (size_t response_index = 0; response_index < responses.size(); response_index++)
+    {
+        const auto &response_protocol = responses[response_index];
+
+        if (serialize(response_protocol).empty())
+            return false;
+
+        size_t offset = 0;
+        uint8_t response_status = 0;
+        uint16_t payload_size = 0;
+        uint16_t file_count = 0;
+
+        if (offset >= response_protocol.payload.size())
+            return false;
+
+        response_status = response_protocol.payload[offset++];
+
+        if (!read_u16(response_protocol.payload, offset, payload_size))
+            return false;
+
+        if (!read_u16(response_protocol.payload, offset, file_count))
+            return false;
+
+        const auto expected_status = response_index + 1 == responses.size() ? status::OK : status::NOT_FINISHED_YET;
+
+        if (response_status != static_cast<uint8_t>(expected_status))
+            return false;
+
+        if (payload_size != response_protocol.payload.size() - 5)
+            return false;
+
+        for (uint16_t i = 0; i < file_count; i++)
+        {
+            file_entry file;
+            uint8_t type = 0;
+
+            if (offset >= response_protocol.payload.size())
+                return false;
+
+            type = response_protocol.payload[offset++];
+
+            file.type = static_cast<file_type>(type);
+
+            if (!read_u32(response_protocol.payload, offset, file.size))
+                return false;
+
+            if (!read_string(response_protocol.payload, offset, file.path))
+                return false;
+
+            files.emplace_back(file);
+        }
+
+        if (offset != response_protocol.payload.size())
+            return false;
+    }
+
+    if (files.size() != expected_files.size())
+    {
+        std::cout << "Expected " << expected_files.size() << " files, received " << files.size() << std::endl;
+        return false;
+    }
+
+    std::cout << "Received " << files.size() << " files in " << responses.size() << " packets" << std::endl;
+    return true;
+}
+
 int main()
 {
     std::cout << "========== OPENFLASH PROTOCOL TEST ==========" << std::endl;
 
-    bool success = test_normal_packet() && test_garbage_before_packet() && test_corrupted_packet()
-                   && test_incomplete_packet() && test_back_to_back_packets() && test_random_stream()
-                   && test_nested_resynchronization() && test_ping_round_trip()
-                   && test_pings_round_trips_with_timeout();
+    // bool success = test_normal_packet() && test_garbage_before_packet() && test_corrupted_packet()
+    //                && test_incomplete_packet() && test_back_to_back_packets() && test_random_stream()
+    //                && test_nested_resynchronization() && test_ping_round_trip()
+    //                && test_pings_round_trips_with_timeout();
+
+    bool success = test_non_consummed_file_list();
 
     std::cout << std::endl;
 

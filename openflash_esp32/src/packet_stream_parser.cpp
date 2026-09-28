@@ -11,7 +11,7 @@ namespace openflash
     {
         packet_stream_parser::packet_stream_parser()
         {
-            _buffer.reserve(header_size + max_payload_size + crc_size);
+            _buffer.reserve(header_size + config.max_payload_size + crc_size);
         }
 
         void packet_stream_parser::reset()
@@ -66,7 +66,7 @@ namespace openflash
 
                 uint16_t payload_size = static_cast<uint16_t>(_buffer[5]) | (static_cast<uint16_t>(_buffer[6]) << 8);
 
-                if (payload_size > max_payload_size)
+                if (payload_size > config.max_payload_size)
                 {
                     _buffer.erase(_buffer.begin());
                     _stats.invalid_length++;

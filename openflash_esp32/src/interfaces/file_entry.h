@@ -24,6 +24,20 @@ namespace openflash
             int16_t parentId;
             file_type type;
             uint8_t depth;
+
+            file_entry()
+            {
+                size = 0;
+                type = file_type::FOLDER;
+                path = "";
+            }
+
+            file_entry(uint32_t size_, file_type type_, std::string path_)
+            {
+                size = size_;
+                type = type_;
+                path = path_;
+            }
         };
     }
 }

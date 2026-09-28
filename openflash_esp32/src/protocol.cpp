@@ -7,6 +7,8 @@ namespace openflash
 {
     namespace esp32
     {
+        Config config;
+
         bool is_command_supported(const command &command_)
         {
             switch (command_)
@@ -40,7 +42,7 @@ namespace openflash
 
             uint16_t payload_size = static_cast<uint16_t>(bytes[5]) | (static_cast<uint16_t>(bytes[6]) << 8);
 
-            if (payload_size > max_payload_size)
+            if (payload_size > config.max_payload_size)
                 return std::nullopt;
 
             size_t expected_size = header_size + payload_size + crc_size;
@@ -72,7 +74,7 @@ namespace openflash
         std::vector<uint8_t> serialize(const protocol &protocol_)
         {
             // limit serialization load
-            if (protocol_.payload.size() > max_payload_size)
+            if (protocol_.payload.size() > config.max_payload_size)
                 return {};
 
             // only ping for now
@@ -145,6 +147,8 @@ namespace openflash
                     return "Not ready";
                 case status::OK:
                     return "OK";
+                case status::NOT_FINISHED_YET:
+                    return "Not finished yet";
 
                 default:
                     return "Unhandled status";

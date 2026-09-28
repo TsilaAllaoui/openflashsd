@@ -14,13 +14,14 @@ namespace openflash
         {
         private:
             i_filesystem &_filesystem;
+            int _last_request_index;
 
         public:
             request_handler(i_filesystem &filesystem);
-            protocol handle(const protocol &request);
+            std::vector<protocol> handle(const protocol &request);
             void handle_ping(std::vector<uint8_t> &payload);
             void handle_get_cart_infos(std::vector<uint8_t> &payload);
-            void handle_list_files(const std::vector<uint8_t> &request, std::vector<uint8_t> &payload);
+            void handle_list_files(const protocol &request, std::vector<protocol> &responses);
         };
     }
 }

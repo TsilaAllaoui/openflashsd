@@ -14,6 +14,7 @@ add_library(openflash_core STATIC
     openflash_esp32/src/protocol.cpp
     openflash_esp32/src/packet_stream_parser.cpp
     openflash_esp32/src/request_handler.cpp
+    openflash_esp32/src/utilities.cpp
 )
 
 target_include_directories(openflash_core PUBLIC
@@ -24,6 +25,7 @@ target_include_directories(openflash_core PUBLIC
 
 add_library(openflash_sender STATIC
     sender/src/request_sender.cpp
+    sender/src/mock_filesystem.cpp
 )
 
 target_include_directories(openflash_sender PUBLIC

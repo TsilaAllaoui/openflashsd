@@ -13,7 +13,7 @@ namespace openflash
             uint8_t get_current_sequence_number();
 
         public:
-            std::vector<uint8_t> send(command command_);
+            std::vector<uint8_t> send(command command_, const std::vector<uint8_t> &request = {});
         };
     }
 }

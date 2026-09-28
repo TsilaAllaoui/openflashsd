@@ -67,5 +67,19 @@ namespace openflash
 
             payload.emplace_back((value >> 24) & 0xFF);
         }
+
+        bool read_u32(const std::vector<uint8_t> &payload, size_t &offset, uint32_t &value)
+        {
+            if (offset + 4 > payload.size())
+                return false;
+
+            value = static_cast<uint32_t>(payload[offset]) | (static_cast<uint32_t>(payload[offset + 1]) << 8)
+                    | (static_cast<uint32_t>(payload[offset + 2]) << 16)
+                    | (static_cast<uint32_t>(payload[offset + 3]) << 24);
+
+            offset += 4;
+
+            return true;
+        }
     }
 }

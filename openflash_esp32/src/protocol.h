@@ -22,13 +22,19 @@ namespace openflash
 {
     namespace esp32
     {
+        struct Config
+        {
+            uint32_t max_payload_size = 4096;
+            uint32_t max_sd_frequency = 8000000;
+        };
+
+        extern Config config;
 
         constexpr uint8_t magic_0 = 'O';
         constexpr uint8_t magic_1 = 'F';
         constexpr size_t header_size = 7;
         constexpr size_t crc_size = 2;
         constexpr size_t minimum_packet_size = header_size + crc_size;
-        constexpr size_t max_payload_size = 1024;
         constexpr uint8_t current_protocol_version = 1;
 
         enum class command : uint8_t
@@ -50,7 +56,8 @@ namespace openflash
             INVALID_COMMAND = 0x02,
             INVALID_PAYLOAD = 0x03,
             NOT_FOUND = 0x04,
-            NOT_READY = 0x05
+            NOT_READY = 0x05,
+            NOT_FINISHED_YET = 0x06
         };
 
         struct protocol
