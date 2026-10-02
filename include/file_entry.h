@@ -9,6 +9,8 @@
 #include "bn_optional.h"
 #include "bn_string_view.h"
 
+#include "common.h"
+
 constexpr int screen_left = -(bn::display::width() / 2);
 constexpr int screen_top = -(bn::display::height() / 2);
 constexpr int file_x = screen_left + 40;
@@ -20,14 +22,6 @@ constexpr int max_file_count = 100;
 namespace openflash
 {
     struct rom_infos;
-
-    enum class file_type : uint8_t
-    {
-        NORMAL_FILE,
-        FOLDER,
-        GBA_FILE,
-        SAVE_FILE
-    };
 
     class file_entry
     {

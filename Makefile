@@ -35,8 +35,8 @@ TARGET      	:=  $(notdir $(CURDIR))
 BUILD       	:=  build
 LIBBUTANO   	:=  lib/butano/butano
 PYTHON      	:=  python3
-SOURCES     	:=  src src/api src/generated src/scenes src/utilities
-INCLUDES    	:=  include include/api include/generated include/mock include/scenes include/utilities
+SOURCES     	:=  src src/api src/generated src/scenes src/utilities src/communication ../protocol
+INCLUDES    	:=  include include/api include/generated include/mock include/scenes include/utilities include/communication ../protocol
 DATA        	:=
 GRAPHICS    	:=  graphics
 AUDIO               :=
@@ -59,7 +59,7 @@ endif
 ifeq ($(OPENFLASH_DEBUG),1)
 USERFLAGS    := -Os -g3 -fno-omit-frame-pointer
 USERLDFLAGS  :=
-USERCXXFLAGS += -DBN_CFG_LOG_ENABLED=true -DBN_CFG_ASSERT_ENABLED=true
+USERCXXFLAGS += -DBN_CFG_LOG_ENABLED=true -DBN_CFG_ASSERT_ENABLED=true -DUSELUASERVER
 else
 USERFLAGS    := -Os -flto=auto
 USERLDFLAGS  := -flto=auto

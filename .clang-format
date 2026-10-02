@@ -98,6 +98,11 @@ ReflowComments: false
 
 NamespaceIndentation: All
 CompactNamespaces: false
+FixNamespaceComments: false
 
 PackConstructorInitializers: Never
 BreakConstructorInitializers: AfterColon
+
+AccessModifierOffset: -4
+SpacesBeforeTrailingComments: 1
+FixNamespaceComments: true
