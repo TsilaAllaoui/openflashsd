@@ -1,12 +1,16 @@
 ## OpenFlashSD - GBA Cart flasher via SDCard and ESP32
 
-- ### Working GBA frontend/screens side
+### Working GBA frontend/screens side
     - File browser
     - Flashing rom
     - Dump cartridge
     - Backup/restore save
 
-## Pictures
+### Working ESP32 side
+    - receive PING packet
+    - respond PONG to GBA
+
+## Pictures of GBA Side
 ![main_menu](images/main_menu.bmp)
 ![file_browser](images/file_browser.bmp)
 ![process](images/process.bmp)
@@ -18,4 +22,5 @@
 
 
 # TODO
-- Server side from ESP32
+- Make ESP32 take all the remaining command as only PING works for now
+- Wire the two side for the rest of the commands
