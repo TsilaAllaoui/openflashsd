@@ -5,6 +5,7 @@
 local MAILBOX =
     0x02000000 -- CHANGE THIS
 
+
 --------------------------------------------------
 -- Mailbox layout
 --------------------------------------------------
@@ -33,6 +34,7 @@ local TX_DATA =
 local RX_DATA =
     MAILBOX + 8204
 
+
 --------------------------------------------------
 -- Ring configuration
 --------------------------------------------------
@@ -42,6 +44,7 @@ local BUFFER_SIZE =
 
 local BUFFER_MASK =
     BUFFER_SIZE - 1
+
 
 --------------------------------------------------
 -- OpenFlash protocol
@@ -68,6 +71,7 @@ local STATUS_OK =
 local MAX_PAYLOAD_SIZE =
     4096
 
+
 --------------------------------------------------
 -- Server state
 --------------------------------------------------
@@ -81,6 +85,7 @@ local last_ping_sequence =
 local AUTO_PONG =
     true
 
+
 --------------------------------------------------
 -- Logging
 --------------------------------------------------
@@ -93,6 +98,7 @@ local function log(text)
 
 end
 
+
 local function warn(text)
 
     console:warn(
@@ -100,6 +106,7 @@ local function warn(text)
     )
 
 end
+
 
 --------------------------------------------------
 -- Formatting
@@ -113,6 +120,7 @@ local function hex_byte(value)
     )
 
 end
+
 
 local function hex_bytes(bytes)
 
@@ -134,6 +142,7 @@ local function hex_bytes(bytes)
     )
 
 end
+
 
 --------------------------------------------------
 -- CRC16
@@ -181,6 +190,7 @@ local function crc16(
     return crc
 
 end
+
 
 --------------------------------------------------
 -- Build OpenFlash packet
@@ -230,6 +240,7 @@ local function build_packet(
 
 end
 
+
 --------------------------------------------------
 -- Payload as text
 --------------------------------------------------
@@ -269,6 +280,7 @@ local function payload_text(
     return table.concat(result)
 
 end
+
 
 --------------------------------------------------
 -- Write bytes into GBA RX ring
@@ -343,6 +355,7 @@ local function send_to_gba(
 
 end
 
+
 --------------------------------------------------
 -- Send PONG
 --------------------------------------------------
@@ -371,6 +384,7 @@ local function send_pong(
 
 end
 
+
 --------------------------------------------------
 -- Handle complete request
 --------------------------------------------------
@@ -398,6 +412,32 @@ local function handle_packet(
             packet[7 + i]
 
     end
+
+    --------------------------------------------------
+    -- DEBUG
+    --
+    -- Debug packets are special:
+    --
+    -- Do NOT print the raw packet bytes.
+    -- Print only the payload as readable text.
+    --------------------------------------------------
+
+    if
+        command == CMD_DEBUG
+    then
+
+        log(
+            "GBA DEBUG: " ..
+            payload_text(payload)
+        )
+
+        return
+
+    end
+
+    --------------------------------------------------
+    -- Normal packet logging
+    --------------------------------------------------
 
     log(
         string.format(
@@ -440,21 +480,8 @@ local function handle_packet(
     end
 
     --------------------------------------------------
-    -- DEBUG
+    -- Unsupported command
     --------------------------------------------------
-
-    if
-        command == CMD_DEBUG
-    then
-
-        log(
-            "GBA DEBUG: " ..
-            payload_text(payload)
-        )
-
-        return
-
-    end
 
     log(
         string.format(
@@ -464,6 +491,7 @@ local function handle_packet(
     )
 
 end
+
 
 --------------------------------------------------
 -- Validate packet
@@ -476,7 +504,9 @@ local function packet_valid(
     if
         #packet < 9
     then
+
         return false
+
     end
 
     local expected_crc =
@@ -494,6 +524,7 @@ local function packet_valid(
         received_crc
 
 end
+
 
 --------------------------------------------------
 -- Process TX stream
@@ -522,7 +553,9 @@ local function process_tx_buffer()
         if
             #tx_packet_buffer < 2
         then
+
             return
+
         end
 
         if
@@ -545,7 +578,9 @@ local function process_tx_buffer()
         if
             #tx_packet_buffer < 7
         then
+
             return
+
         end
 
         local payload_size =
@@ -579,7 +614,9 @@ local function process_tx_buffer()
             #tx_packet_buffer <
             packet_size
         then
+
             return
+
         end
 
         --------------------------------------------------
@@ -630,6 +667,7 @@ local function process_tx_buffer()
 
 end
 
+
 --------------------------------------------------
 -- Drain bytes sent by GBA
 --------------------------------------------------
@@ -679,6 +717,7 @@ local function drain_gba_tx()
 
 end
 
+
 --------------------------------------------------
 -- Overflow diagnostics
 --------------------------------------------------
@@ -721,6 +760,7 @@ local function check_overflow()
 
 end
 
+
 --------------------------------------------------
 -- Frame callback
 --------------------------------------------------
@@ -732,6 +772,7 @@ local function on_frame()
     check_overflow()
 
 end
+
 
 --------------------------------------------------
 -- Startup

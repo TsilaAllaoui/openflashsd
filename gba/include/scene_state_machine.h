@@ -31,7 +31,6 @@ namespace openflash
     public:
         ~scene_state_machine() = default;
         static scene_state_machine &instance();
-        i_scene *get_current_scene_state();
         void set_current_scene_state(scene_type state);
         void render_current_scene();
         void update_current_scene();

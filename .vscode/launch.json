@@ -1,0 +1,43 @@
+{
+  "configurations": [
+    {
+      "name": "(gdb) Launch",
+      "type": "cppdbg",
+      "request": "launch",
+      "targetArchitecture": "arm",
+      "preLaunchTask": "GBA: Build",
+      "program": "${workspaceFolder}/gba/gba.elf",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${fileDirname}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerServerAddress": "localhost:2345",
+      "windows": {
+        "miDebuggerPath": "C:\\devkitPro\\devkitARM\\bin\\arm-none-eabi-gdb.exe",
+        "setupCommands": [
+          {
+            "text": "shell start /b \"\" \"${env:ProgramFiles}/mGBA/mGBA.exe\" -g \"${workspaceFolder}/gba/gba.elf\""
+          }
+        ]
+      },
+      "linux": {
+        "miDebuggerPath": "${env:DEVKITARM}/bin/arm-none-eabi-gdb",
+        "setupCommands": [
+          {
+            "text": "shell \"mgba-qt\" -g \"${workspaceFolder}/gba/gba.elf\" &"
+          }
+        ]
+      },
+      "osx": {
+        "miDebuggerPath": "/opt/devkitpro/devkitARM/bin/arm-none-eabi-gdb",
+        "setupCommands": [
+          {
+            "text": "shell open -a /Applications/mGBA.app --args -g \"${workspaceFolder}/gba/gba.elf\""
+          }
+        ]
+      }
+    }
+  ]
+}

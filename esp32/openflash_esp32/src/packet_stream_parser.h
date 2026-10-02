@@ -32,7 +32,6 @@ namespace openflash
             void reset();
             std::optional<protocol> push_packet(const uint8_t &byte);
             const parser_stats &stats() const;
-            bool has_pending_data() const;
         };
     }
 }

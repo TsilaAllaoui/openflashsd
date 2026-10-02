@@ -1,0 +1,3 @@
+[submodule "gba/lib/butano"]
+        path = gba/lib/butano
+        url = https://github.com/gvaliente/butano

@@ -1,6 +1,21 @@
-build/
-.vscode/
-
+# Build outputs
+**/build/
+*.elf
 *.gba
+*.sav
+
+# Python
+**/__pycache__/
+*.py[cod]
+**/.venv/
+
+# Archives
 *.tar
 *.tar.xz
+*.7z
+*.zip
+
+# Nested editor state. Root workspace settings are intentionally tracked.
+**/.vscode/
+!/.vscode/
+!/.vscode/**

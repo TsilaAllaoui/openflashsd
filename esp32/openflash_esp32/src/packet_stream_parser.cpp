@@ -1,7 +1,3 @@
-#include <sstream>
-#include <iostream>
-#include <algorithm>
-
 #include "protocol.h"
 #include "config/config.h"
 #include "packet_stream_parser.h"
@@ -23,11 +19,6 @@ namespace openflash
         const parser_stats &packet_stream_parser::stats() const
         {
             return _stats;
-        }
-
-        bool packet_stream_parser::has_pending_data() const
-        {
-            return !_buffer.empty();
         }
 
         std::optional<protocol> packet_stream_parser::push_packet(const uint8_t &byte)

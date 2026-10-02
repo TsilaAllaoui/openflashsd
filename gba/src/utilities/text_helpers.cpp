@@ -4,12 +4,6 @@
 
 namespace openflash::text_helpers
 {
-    void clear_text(
-        bn::ivector<bn::sprite_ptr> &text_sprites)
-    {
-        text_sprites.clear();
-    }
-
     void draw_left(
         bn::sprite_text_generator &text_generator,
         bn::string_view text,
@@ -107,23 +101,6 @@ namespace openflash::text_helpers
         return result;
     }
 
-    void draw_centered_truncated(
-        bn::sprite_text_generator &text_generator,
-        bn::string_view text,
-        int y,
-        int max_characters,
-        bn::ivector<bn::sprite_ptr> &text_sprites)
-    {
-        bn::string<64> display_text =
-            truncate_text(text, max_characters);
-
-        draw_centered(
-            text_generator,
-            display_text,
-            y,
-            text_sprites);
-    }
-
     void draw_label_value(
         bn::sprite_text_generator &text_generator,
         bn::string_view label,
@@ -158,44 +135,4 @@ namespace openflash::text_helpers
         }
     }
 
-    void draw_centered_multiline(
-        bn::sprite_text_generator &text_generator,
-        bn::string_view text,
-        int center_x,
-        int start_y,
-        int line_spacing,
-        bn::ivector<bn::sprite_ptr> &text_sprites)
-    {
-        text_generator.set_center_alignment();
-
-        int line_start = 0;
-        int line_index = 0;
-
-        for (int index = 0; index <= text.size(); ++index)
-        {
-            bool end_of_text =
-                index == text.size();
-
-            bool new_line =
-                !end_of_text &&
-                text[index] == '\n';
-
-            if (end_of_text || new_line)
-            {
-                bn::string_view line =
-                    text.substr(
-                        line_start,
-                        index - line_start);
-
-                text_generator.generate(
-                    center_x,
-                    start_y + line_index * line_spacing,
-                    line,
-                    text_sprites);
-
-                ++line_index;
-                line_start = index + 1;
-            }
-        }
-    }
 }

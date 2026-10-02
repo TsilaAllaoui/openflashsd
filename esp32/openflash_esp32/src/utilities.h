@@ -1,6 +1,11 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <vector>
+
 namespace openflash
 {
     namespace esp32

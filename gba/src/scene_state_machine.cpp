@@ -21,11 +21,6 @@ namespace openflash
         return instance;
     }
 
-    i_scene *scene_state_machine::get_current_scene_state()
-    {
-        return _current_scene;
-    }
-
     void scene_state_machine::set_current_scene_state(scene_type type)
     {
         // Free the last scene

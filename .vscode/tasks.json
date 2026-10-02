@@ -1,0 +1,51 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "GBA: Build",
+            "type": "shell",
+            "command": "${workspaceFolder}/tools/build_gba.sh",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "GBA: Generate maps + Build",
+            "type": "shell",
+            "command": "${workspaceFolder}/tools/build_gba.sh",
+            "args": [
+                "--maps"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "GBA: Build + Run",
+            "type": "shell",
+            "command": "${workspaceFolder}/tools/build_gba.sh",
+            "args": [
+                "--run"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "GBA: Generate maps + Build + Run",
+            "type": "shell",
+            "command": "${workspaceFolder}/tools/build_gba.sh",
+            "args": [
+                "--maps",
+                "--run"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ]
+}

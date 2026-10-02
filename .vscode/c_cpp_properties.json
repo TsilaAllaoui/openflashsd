@@ -1,0 +1,57 @@
+{
+    "configurations": [
+        {
+            "name": "OpenFlash GBA",
+            "compilerPath": "/opt/devkitpro/devkitARM/bin/arm-none-eabi-g++",
+            "compilerArgs": [
+                "-mthumb",
+                "-mthumb-interwork",
+                "-mcpu=arm7tdmi",
+                "-mtune=arm7tdmi"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++23",
+            "intelliSenseMode": "linux-gcc-arm",
+            "includePath": [
+                "${workspaceFolder}/gba/include",
+                "${workspaceFolder}/gba/include/**",
+                "${workspaceFolder}/gba/build",
+                "${workspaceFolder}/gba/lib/butano/butano/include",
+                "${workspaceFolder}/gba/lib/butano/butano/hw/include",
+                "${workspaceFolder}/gba/lib/butano/butano/hw/3rd_party/libtonc/include",
+                "${workspaceFolder}/gba/lib/butano/butano/hw/3rd_party/libugba/include",
+                "${workspaceFolder}/protocol"
+            ],
+            "defines": [
+                "__GBA__",
+                "BN_TOOLCHAIN_TAG=\"DKA\"",
+                "USEMOCK"
+            ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/gba/include",
+                    "${workspaceFolder}/gba/lib/butano/butano/include",
+                    "${workspaceFolder}/protocol"
+                ]
+            }
+        },
+        {
+            "name": "OpenFlash ESP32",
+            "compilerPath": "/usr/bin/g++",
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "linux-gcc-x64",
+            "includePath": [
+                "${workspaceFolder}/esp32/openflash_esp32",
+                "${workspaceFolder}/esp32/openflash_esp32/src",
+                "${workspaceFolder}/esp32/sender/include",
+                "${workspaceFolder}/protocol"
+            ],
+            "compileCommands": [
+                "${workspaceFolder}/esp32/build/compile_commands.json"
+            ]
+        }
+    ],
+    "version": 4,
+    "enableConfigurationSquiggles": true
+}

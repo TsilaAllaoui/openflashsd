@@ -9,9 +9,6 @@
 
 namespace openflash::text_helpers
 {
-    void clear_text(
-        bn::ivector<bn::sprite_ptr> &text_sprites);
-
     void draw_left(
         bn::sprite_text_generator &text_generator,
         bn::string_view text,
@@ -43,13 +40,6 @@ namespace openflash::text_helpers
         bn::string_view text,
         int max_characters);
 
-    void draw_centered_truncated(
-        bn::sprite_text_generator &text_generator,
-        bn::string_view text,
-        int y,
-        int max_characters,
-        bn::ivector<bn::sprite_ptr> &text_sprites);
-
     void draw_label_value(
         bn::sprite_text_generator &text_generator,
         bn::string_view label,
@@ -60,13 +50,6 @@ namespace openflash::text_helpers
         bn::ivector<bn::sprite_ptr> &text_sprites,
         int min_spacing = 8);
 
-    void draw_centered_multiline(
-        bn::sprite_text_generator &text_generator,
-        bn::string_view text,
-        int center_x,
-        int start_y,
-        int line_spacing,
-        bn::ivector<bn::sprite_ptr> &text_sprites);
 }
 
 #endif // TEXT_HELPERS_H

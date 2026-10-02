@@ -15,8 +15,7 @@ namespace openflash
         constexpr uint16_t file_list_header_size = 5;
 
         request_handler::request_handler(i_filesystem &filesystem) :
-            _filesystem(filesystem),
-            _last_request_index(0)
+            _filesystem(filesystem)
         {
         }
 

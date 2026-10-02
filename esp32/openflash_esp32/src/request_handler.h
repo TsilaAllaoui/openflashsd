@@ -14,7 +14,6 @@ namespace openflash
         {
         private:
             i_filesystem &_filesystem;
-            int _last_request_index;
 
         public:
             request_handler(i_filesystem &filesystem);

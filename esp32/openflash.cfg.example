@@ -1,2 +1,4 @@
+# Copy this file to the root of the SD card as /openflash.cfg.
+# max_payload_size must not exceed the shared protocol maximum (4096 bytes).
 max_payload_size=1024
 max_sd_frequency=20000000

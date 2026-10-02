@@ -64,7 +64,7 @@ namespace openflash
                 {
                     const long parsed_value = value.toInt();
 
-                    if (parsed_value > 0 && parsed_value <= UINT16_MAX)
+                    if (parsed_value > 0 && parsed_value <= openflash::max_payload_size)
                         config.max_payload_size = static_cast<uint32_t>(parsed_value);
                 }
                 else if (key == "max_sd_frequency")

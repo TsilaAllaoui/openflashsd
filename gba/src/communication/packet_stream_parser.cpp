@@ -1,5 +1,3 @@
-#include <algorithm>
-
 #include "protocol.h"
 #include "packet_decoder.h"
 #include "communication/packet_stream_parser.h"
@@ -15,11 +13,6 @@ namespace openflash
         void packet_stream_parser::reset()
         {
             _buffer.clear();
-        }
-
-        bool packet_stream_parser::has_pending_data() const
-        {
-            return !_buffer.empty();
         }
 
         bn::optional<protocol> packet_stream_parser::push_packet(const uint8_t &byte)

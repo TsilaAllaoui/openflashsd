@@ -1,5 +1,4 @@
 #include <vector>
-#include <iostream>
 
 #include "crc16.h"
 #include "common.h"
@@ -11,25 +10,6 @@ namespace openflash
 {
     namespace esp32
     {
-        bool is_command_supported(const command &command_)
-        {
-            switch (command_)
-            {
-                case command::PING:
-                case command::GET_CART_INFO:
-                case command::GET_PROCESS_INFO:
-                case command::GET_ROM_INFO:
-                case command::GET_SAVE_INFO:
-                case command::LIST_FILES:
-                case command::RESET_PROCESS:
-                case command::START_PROCESS:
-                    return true;
-
-                default:
-                    return false;
-            }
-        }
-
         std::optional<protocol> deserialize(const std::vector<uint8_t> &bytes)
         {
             //size checks
@@ -95,28 +75,6 @@ namespace openflash
             return result;
         }
 
-        std::string status_to_string(const status &status_)
-        {
-            switch (status_)
-            {
-                case status::ERROR:
-                    return "Error occured";
-                case status::INVALID_COMMAND:
-                    return "Invalid command";
-                case status::INVALID_PAYLOAD:
-                    return "Invalid payload";
-                case status::NOT_FOUND:
-                    return "Not found";
-                case status::NOT_READY:
-                    return "Not ready";
-                case status::OK:
-                    return "OK";
-                case status::NOT_FINISHED_YET:
-                    return "Not finished yet";
 
-                default:
-                    return "Unhandled status";
-            }
-        }
     }
 }

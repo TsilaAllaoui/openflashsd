@@ -20,9 +20,8 @@ namespace openflash
             packet_stream_parser();
             void reset();
             bn::optional<protocol> push_packet(const uint8_t &byte);
-            bool has_pending_data() const;
         };
-    } // namespace gba
-} // namespace openflash
+    }
+}
 
 #endif // GBA_PACKET_STREAM_PARSER_H
