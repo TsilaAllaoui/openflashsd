@@ -1,6 +1,0 @@
-[submodule "gba"]
-	path = gba
-	url = https://github.com/TsilaAllaoui/openflash_gba
-[submodule "esp32"]
-	path = esp32
-	url = https://github.com/TsilaAllaoui/openflash_esp32
