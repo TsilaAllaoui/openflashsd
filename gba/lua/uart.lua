@@ -1,0 +1,754 @@
+--------------------------------------------------
+-- OpenFlash mGBA mailbox server
+--------------------------------------------------
+
+local MAILBOX =
+    0x02000000 -- CHANGE THIS
+
+--------------------------------------------------
+-- Mailbox layout
+--------------------------------------------------
+
+local TX_READ =
+    MAILBOX + 0
+
+local TX_WRITE =
+    MAILBOX + 2
+
+local RX_READ =
+    MAILBOX + 4
+
+local RX_WRITE =
+    MAILBOX + 6
+
+local TX_OVERFLOW =
+    MAILBOX + 8
+
+local RX_OVERFLOW =
+    MAILBOX + 9
+
+local TX_DATA =
+    MAILBOX + 12
+
+local RX_DATA =
+    MAILBOX + 8204
+
+--------------------------------------------------
+-- Ring configuration
+--------------------------------------------------
+
+local BUFFER_SIZE =
+    8192
+
+local BUFFER_MASK =
+    BUFFER_SIZE - 1
+
+--------------------------------------------------
+-- OpenFlash protocol
+--------------------------------------------------
+
+local MAGIC_0 =
+    0x4F
+
+local MAGIC_1 =
+    0x46
+
+local PROTOCOL_VERSION =
+    1
+
+local CMD_PING =
+    0x01
+
+local CMD_DEBUG =
+    0x09
+
+local STATUS_OK =
+    0x00
+
+local MAX_PAYLOAD_SIZE =
+    4096
+
+--------------------------------------------------
+-- Server state
+--------------------------------------------------
+
+local tx_packet_buffer =
+    {}
+
+local last_ping_sequence =
+    nil
+
+local AUTO_PONG =
+    true
+
+--------------------------------------------------
+-- Logging
+--------------------------------------------------
+
+local function log(text)
+
+    console:log(
+        "[OpenFlash] " .. text
+    )
+
+end
+
+local function warn(text)
+
+    console:warn(
+        "[OpenFlash] " .. text
+    )
+
+end
+
+--------------------------------------------------
+-- Formatting
+--------------------------------------------------
+
+local function hex_byte(value)
+
+    return string.format(
+        "%02X",
+        value & 0xFF
+    )
+
+end
+
+local function hex_bytes(bytes)
+
+    local parts =
+        {}
+
+    for i = 1, #bytes do
+
+        parts[#parts + 1] =
+            hex_byte(
+                bytes[i]
+            )
+
+    end
+
+    return table.concat(
+        parts,
+        " "
+    )
+
+end
+
+--------------------------------------------------
+-- CRC16
+--------------------------------------------------
+
+local function crc16(
+    bytes,
+    count
+)
+
+    local crc =
+        0xFFFF
+
+    local size =
+        count or #bytes
+
+    for i = 1, size do
+
+        crc =
+            crc ~
+            ((bytes[i] & 0xFF) << 8)
+
+        for _ = 1, 8 do
+
+            if
+                (crc & 0x8000) ~= 0
+            then
+
+                crc =
+                    ((crc << 1) ~ 0x1021)
+                    & 0xFFFF
+
+            else
+
+                crc =
+                    (crc << 1)
+                    & 0xFFFF
+
+            end
+
+        end
+
+    end
+
+    return crc
+
+end
+
+--------------------------------------------------
+-- Build OpenFlash packet
+--------------------------------------------------
+
+local function build_packet(
+    sequence,
+    command,
+    payload
+)
+
+    payload =
+        payload or {}
+
+    local packet =
+    {
+        MAGIC_0,
+        MAGIC_1,
+
+        PROTOCOL_VERSION,
+
+        sequence & 0xFF,
+
+        command & 0xFF,
+
+        #payload & 0xFF,
+        (#payload >> 8) & 0xFF
+    }
+
+    for i = 1, #payload do
+
+        packet[#packet + 1] =
+            payload[i] & 0xFF
+
+    end
+
+    local crc =
+        crc16(packet)
+
+    packet[#packet + 1] =
+        crc & 0xFF
+
+    packet[#packet + 1] =
+        (crc >> 8) & 0xFF
+
+    return packet
+
+end
+
+--------------------------------------------------
+-- Payload as text
+--------------------------------------------------
+
+local function payload_text(
+    payload
+)
+
+    local result =
+        {}
+
+    for i = 1, #payload do
+
+        local value =
+            payload[i]
+
+        if
+            value >= 32 and
+            value <= 126
+        then
+
+            result[#result + 1] =
+                string.char(value)
+
+        else
+
+            result[#result + 1] =
+                string.format(
+                    "\\x%02X",
+                    value
+                )
+
+        end
+
+    end
+
+    return table.concat(result)
+
+end
+
+--------------------------------------------------
+-- Write bytes into GBA RX ring
+--------------------------------------------------
+
+local function send_to_gba(
+    bytes
+)
+
+    local read =
+        emu:read16(
+            RX_READ
+        )
+
+    local write =
+        emu:read16(
+            RX_WRITE
+        )
+
+    for i = 1, #bytes do
+
+        local next_write =
+            (write + 1) &
+            BUFFER_MASK
+
+        --------------------------------------------------
+        -- Ring full
+        --------------------------------------------------
+
+        if
+            next_write == read
+        then
+
+            emu:write8(
+                RX_OVERFLOW,
+                1
+            )
+
+            warn(
+                "RX mailbox full"
+            )
+
+            return false
+
+        end
+
+        emu:write8(
+            RX_DATA + write,
+            bytes[i]
+        )
+
+        write =
+            next_write
+
+    end
+
+    --------------------------------------------------
+    -- Publish only after writing all bytes
+    --------------------------------------------------
+
+    emu:write16(
+        RX_WRITE,
+        write
+    )
+
+    log(
+        "Peer -> GBA: " ..
+        hex_bytes(bytes)
+    )
+
+    return true
+
+end
+
+--------------------------------------------------
+-- Send PONG
+--------------------------------------------------
+
+local function send_pong(
+    sequence
+)
+
+    local packet =
+        build_packet(
+            sequence,
+            CMD_PING,
+            {
+                STATUS_OK
+            }
+        )
+
+    log(
+        "Sending PONG sequence " ..
+        sequence
+    )
+
+    send_to_gba(
+        packet
+    )
+
+end
+
+--------------------------------------------------
+-- Handle complete request
+--------------------------------------------------
+
+local function handle_packet(
+    packet
+)
+
+    local sequence =
+        packet[4]
+
+    local command =
+        packet[5]
+
+    local payload_size =
+        packet[6] |
+        (packet[7] << 8)
+
+    local payload =
+        {}
+
+    for i = 1, payload_size do
+
+        payload[#payload + 1] =
+            packet[7 + i]
+
+    end
+
+    log(
+        string.format(
+            "GBA -> server seq=%d cmd=0x%02X payload=%d",
+            sequence,
+            command,
+            payload_size
+        )
+    )
+
+    log(
+        hex_bytes(packet)
+    )
+
+    --------------------------------------------------
+    -- PING
+    --------------------------------------------------
+
+    if
+        command == CMD_PING
+    then
+
+        last_ping_sequence =
+            sequence
+
+        log(
+            "PING received"
+        )
+
+        if AUTO_PONG then
+
+            send_pong(
+                sequence
+            )
+
+        end
+
+        return
+
+    end
+
+    --------------------------------------------------
+    -- DEBUG
+    --------------------------------------------------
+
+    if
+        command == CMD_DEBUG
+    then
+
+        log(
+            "GBA DEBUG: " ..
+            payload_text(payload)
+        )
+
+        return
+
+    end
+
+    log(
+        string.format(
+            "Unhandled command 0x%02X",
+            command
+        )
+    )
+
+end
+
+--------------------------------------------------
+-- Validate packet
+--------------------------------------------------
+
+local function packet_valid(
+    packet
+)
+
+    if
+        #packet < 9
+    then
+        return false
+    end
+
+    local expected_crc =
+        crc16(
+            packet,
+            #packet - 2
+        )
+
+    local received_crc =
+        packet[#packet - 1] |
+        (packet[#packet] << 8)
+
+    return
+        expected_crc ==
+        received_crc
+
+end
+
+--------------------------------------------------
+-- Process TX stream
+--------------------------------------------------
+
+local function process_tx_buffer()
+
+    while true do
+
+        --------------------------------------------------
+        -- Find magic
+        --------------------------------------------------
+
+        while
+            #tx_packet_buffer > 0 and
+            tx_packet_buffer[1] ~= MAGIC_0
+        do
+
+            table.remove(
+                tx_packet_buffer,
+                1
+            )
+
+        end
+
+        if
+            #tx_packet_buffer < 2
+        then
+            return
+        end
+
+        if
+            tx_packet_buffer[2] ~= MAGIC_1
+        then
+
+            table.remove(
+                tx_packet_buffer,
+                1
+            )
+
+            goto continue
+
+        end
+
+        --------------------------------------------------
+        -- Need header
+        --------------------------------------------------
+
+        if
+            #tx_packet_buffer < 7
+        then
+            return
+        end
+
+        local payload_size =
+            tx_packet_buffer[6] |
+            (tx_packet_buffer[7] << 8)
+
+        if
+            payload_size >
+            MAX_PAYLOAD_SIZE
+        then
+
+            warn(
+                "Invalid payload size " ..
+                payload_size
+            )
+
+            table.remove(
+                tx_packet_buffer,
+                1
+            )
+
+            goto continue
+
+        end
+
+        local packet_size =
+            9 +
+            payload_size
+
+        if
+            #tx_packet_buffer <
+            packet_size
+        then
+            return
+        end
+
+        --------------------------------------------------
+        -- Extract packet
+        --------------------------------------------------
+
+        local packet =
+            {}
+
+        for i = 1, packet_size do
+
+            packet[i] =
+                tx_packet_buffer[i]
+
+        end
+
+        for _ = 1, packet_size do
+
+            table.remove(
+                tx_packet_buffer,
+                1
+            )
+
+        end
+
+        --------------------------------------------------
+        -- Validate
+        --------------------------------------------------
+
+        if packet_valid(packet) then
+
+            handle_packet(
+                packet
+            )
+
+        else
+
+            warn(
+                "Invalid CRC: " ..
+                hex_bytes(packet)
+            )
+
+        end
+
+        ::continue::
+
+    end
+
+end
+
+--------------------------------------------------
+-- Drain bytes sent by GBA
+--------------------------------------------------
+
+local function drain_gba_tx()
+
+    local read =
+        emu:read16(
+            TX_READ
+        )
+
+    local write =
+        emu:read16(
+            TX_WRITE
+        )
+
+    while
+        read ~= write
+    do
+
+        local byte =
+            emu:read8(
+                TX_DATA + read
+            )
+
+        tx_packet_buffer[
+            #tx_packet_buffer + 1
+        ] =
+            byte
+
+        read =
+            (read + 1) &
+            BUFFER_MASK
+
+    end
+
+    --------------------------------------------------
+    -- Tell GBA everything was consumed
+    --------------------------------------------------
+
+    emu:write16(
+        TX_READ,
+        read
+    )
+
+    process_tx_buffer()
+
+end
+
+--------------------------------------------------
+-- Overflow diagnostics
+--------------------------------------------------
+
+local function check_overflow()
+
+    if
+        emu:read8(
+            TX_OVERFLOW
+        ) ~= 0
+    then
+
+        warn(
+            "GBA TX mailbox overflow"
+        )
+
+        emu:write8(
+            TX_OVERFLOW,
+            0
+        )
+
+    end
+
+    if
+        emu:read8(
+            RX_OVERFLOW
+        ) ~= 0
+    then
+
+        warn(
+            "GBA RX mailbox overflow"
+        )
+
+        emu:write8(
+            RX_OVERFLOW,
+            0
+        )
+
+    end
+
+end
+
+--------------------------------------------------
+-- Frame callback
+--------------------------------------------------
+
+local function on_frame()
+
+    drain_gba_tx()
+
+    check_overflow()
+
+end
+
+--------------------------------------------------
+-- Startup
+--------------------------------------------------
+
+log(
+    string.format(
+        "Mailbox address = 0x%08X",
+        MAILBOX
+    )
+)
+
+log(
+    "Virtual ESP32 mailbox server started"
+)
+
+callbacks:add(
+    "frame",
+    on_frame
+)
