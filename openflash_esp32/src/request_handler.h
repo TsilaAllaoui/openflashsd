@@ -22,6 +22,7 @@ namespace openflash
             void handle_ping(std::vector<uint8_t> &payload);
             void handle_get_cart_infos(std::vector<uint8_t> &payload);
             void handle_list_files(const protocol &request, std::vector<protocol> &responses);
+            void handle_debug(const protocol &request, std::vector<uint8_t> &response);
         };
     }
 }

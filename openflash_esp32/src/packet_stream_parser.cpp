@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "protocol.h"
+#include "config/config.h"
 #include "packet_stream_parser.h"
 
 namespace openflash

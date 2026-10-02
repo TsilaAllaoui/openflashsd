@@ -5,13 +5,16 @@
 #include <optional>
 #include <iostream>
 
+#include "common.h"
 #include "protocol.h"
 #include "utilities.h"
+#include "config/config.h"
 #include "request_sender.h"
 #include "request_handler.h"
 #include "mock_filesystem.h"
 #include "packet_stream_parser.h"
 
+using namespace openflash;
 using namespace openflash::esp32;
 
 namespace
@@ -576,8 +579,7 @@ std::string file_type_to_string(const file_type &type)
         return "FILE";
     else if (type == file_type::SAVE_FILE)
         return "SAVE_FILE";
-    else
-        return "UNKNOWN";
+    return "UNKNOWN";
 }
 
 bool test_non_consummed_file_list()
@@ -686,12 +688,10 @@ int main()
 {
     std::cout << "========== OPENFLASH PROTOCOL TEST ==========" << std::endl;
 
-    // bool success = test_normal_packet() && test_garbage_before_packet() && test_corrupted_packet()
-    //                && test_incomplete_packet() && test_back_to_back_packets() && test_random_stream()
-    //                && test_nested_resynchronization() && test_ping_round_trip()
-    //                && test_pings_round_trips_with_timeout();
-
-    bool success = test_non_consummed_file_list();
+    bool success = test_normal_packet() && test_garbage_before_packet() && test_corrupted_packet()
+                   && test_incomplete_packet() && test_back_to_back_packets() && test_random_stream()
+                   && test_nested_resynchronization() && test_ping_round_trip() && test_pings_round_trips_with_timeout()
+                   && test_non_consummed_file_list();
 
     std::cout << std::endl;
 

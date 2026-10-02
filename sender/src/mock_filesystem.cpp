@@ -14,7 +14,7 @@ namespace openflash
             return _ready;
         }
 
-        bool mock_filesystem::list_directory(const std::string &path, std::vector<file_entry> &entries)
+        bool mock_filesystem::list_directory([[maybe_unused]] const std::string &path, std::vector<file_entry> &entries)
         {
             std::vector<file_entry> files = {
                 file_entry(16777216, file_type::GBA_FILE, "Dragon Ball - Advanced Adventure (U)(Ongaku).gba"),

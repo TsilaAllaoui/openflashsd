@@ -8,6 +8,7 @@
 #include "../protocol.h"
 #include "sd_filesystem.h"
 #include "../interfaces/file_entry.h"
+#include "../config/config.h"
 
 namespace openflash
 {

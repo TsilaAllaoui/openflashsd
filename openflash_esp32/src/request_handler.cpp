@@ -1,5 +1,6 @@
 #include "protocol.h"
 #include "utilities.h"
+#include "config/config.h"
 #include "request_handler.h"
 #include "interfaces/rom_infos.h"
 
@@ -61,6 +62,16 @@ namespace openflash
                     handle_list_files(request, responses);
                     break;
 
+                case command::DEBUG:
+                {
+                    protocol response;
+                    response.protocol_version = current_protocol_version;
+                    response.sequence_number = request.sequence_number;
+                    response.cmd = request.cmd;
+                    handle_debug(request, response.payload);
+                    responses.emplace_back(response);
+                    break;
+                }
                 default:
                 {
                     protocol response;
@@ -192,6 +203,12 @@ namespace openflash
             response.cmd = request.cmd;
             response.payload = current_response;
             responses.emplace_back(response);
+        }
+
+        void request_handler::handle_debug(const protocol &request, std::vector<uint8_t> &response)
+        {
+            for (auto &b : request.payload)
+                response.emplace_back(b);
         }
     }
 }

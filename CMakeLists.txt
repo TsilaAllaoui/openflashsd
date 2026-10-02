@@ -15,10 +15,14 @@ add_library(openflash_core STATIC
     openflash_esp32/src/packet_stream_parser.cpp
     openflash_esp32/src/request_handler.cpp
     openflash_esp32/src/utilities.cpp
+    openflash_esp32/src/config/config.cpp
+    openflash_esp32/../../protocol/crc16.cpp
+    openflash_esp32/../../protocol/packet_encoder.cpp
 )
 
 target_include_directories(openflash_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/openflash_esp32/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../protocol
 )
 
 # Request sender

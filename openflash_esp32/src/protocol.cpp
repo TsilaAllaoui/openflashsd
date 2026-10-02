@@ -1,14 +1,16 @@
 #include <vector>
 #include <iostream>
 
+#include "crc16.h"
+#include "common.h"
 #include "protocol.h"
+#include "config/config.h"
+#include "packet_encoder.h"
 
 namespace openflash
 {
     namespace esp32
     {
-        Config config;
-
         bool is_command_supported(const command &command_)
         {
             switch (command_)
@@ -73,62 +75,24 @@ namespace openflash
 
         std::vector<uint8_t> serialize(const protocol &protocol_)
         {
-            // limit serialization load
-            if (protocol_.payload.size() > config.max_payload_size)
+            std::vector<uint8_t> result(9 + protocol_.payload.size());
+
+            size_t encoded_size = 0;
+
+            auto encoding_result = encode_packet(protocol_.sequence_number,
+                                                 protocol_.cmd,
+                                                 protocol_.payload.data(),
+                                                 protocol_.payload.size(),
+                                                 result.data(),
+                                                 result.size(),
+                                                 encoded_size);
+
+            if (!encoding_result)
                 return {};
 
-            // only ping for now
-            std::vector<uint8_t> packet;
+            result.resize(encoded_size);
 
-            // magic
-            packet.emplace_back(magic_0);
-            packet.emplace_back(magic_1);
-
-            // protocol version
-            packet.emplace_back(protocol_.protocol_version);
-
-            // sequence number
-            packet.emplace_back(protocol_.sequence_number);
-
-            // command
-            packet.emplace_back(static_cast<uint8_t>(protocol_.cmd));
-
-            // payload
-            packet.emplace_back(protocol_.payload.size() & 0xFF);
-            packet.emplace_back(protocol_.payload.size() >> 8);
-            for (const auto &byte : protocol_.payload)
-                packet.emplace_back(byte);
-
-            // CRC16
-            auto crc16 = calculate_crc16(packet.data(), packet.size());
-            packet.emplace_back(crc16 & 0xFF);
-            packet.emplace_back((crc16 >> 8) & 0xFF);
-
-            // minimal bytes in packet check (should be 5 at least)
-            if (packet.size() < minimum_packet_size)
-                return {};
-
-            return packet;
-        }
-
-        uint16_t calculate_crc16(const uint8_t *data, size_t size)
-        {
-            uint16_t crc = 0xFFFF;
-
-            for (size_t index = 0; index < size; ++index)
-            {
-                crc ^= static_cast<uint16_t>(data[index]) << 8;
-
-                for (int bit = 0; bit < 8; ++bit)
-                {
-                    if (crc & 0x8000)
-                        crc = static_cast<uint16_t>((crc << 1) ^ 0x1021);
-                    else
-                        crc <<= 1;
-                }
-            }
-
-            return crc;
+            return result;
         }
 
         std::string status_to_string(const status &status_)
