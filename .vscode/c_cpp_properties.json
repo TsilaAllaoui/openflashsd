@@ -32,7 +32,8 @@
                     "${workspaceFolder}/gba/include",
                     "${workspaceFolder}/gba/lib/butano/butano/include",
                     "${workspaceFolder}/protocol"
-                ]
+                ],
+                "limitSymbolsToIncludedHeaders": true
             }
         },
         {
@@ -44,12 +45,43 @@
             "includePath": [
                 "${workspaceFolder}/esp32/openflash_esp32",
                 "${workspaceFolder}/esp32/openflash_esp32/src",
+                "${workspaceFolder}/esp32/openflash_esp32/src/**",
                 "${workspaceFolder}/esp32/sender/include",
-                "${workspaceFolder}/protocol"
+                "${workspaceFolder}/protocol",
+                "/mnt/c/Users/Allaoui/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/cores/esp32",
+                "/mnt/c/Users/Allaoui/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/variants/esp32c3",
+                "/mnt/c/Users/Allaoui/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/libraries/**",
+                "/mnt/c/Users/Allaoui/AppData/Local/Arduino15/packages/esp32/tools/esp32c3-libs/3.3.11/include/**",
+                "/mnt/c/Users/Allaoui/AppData/Local/Arduino15/packages/esp32/tools/esp32c3-libs/3.3.11/qio_qspi/include"
             ],
-            "compileCommands": [
-                "${workspaceFolder}/esp32/build/compile_commands.json"
-            ]
+            "defines": [
+                "F_CPU=160000000L",
+                "ARDUINO=10607",
+                "ARDUINO_ESP32C3_DEV",
+                "ARDUINO_ARCH_ESP32",
+                "ARDUINO_BOARD=\"ESP32C3_DEV\"",
+                "ARDUINO_VARIANT=\"esp32c3\"",
+                "ARDUINO_PARTITION_default",
+                "ARDUINO_HOST_OS=\"windows\"",
+                "ARDUINO_FQBN=\"esp32:esp32:esp32c3:CDCOnBoot=cdc\"",
+                "ESP32=ESP32",
+                "CORE_DEBUG_LEVEL=0",
+                "ARDUINO_USB_MODE=1",
+                "ARDUINO_USB_CDC_ON_BOOT=1"
+            ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/esp32/openflash_esp32",
+                    "${workspaceFolder}/esp32/openflash_esp32/src",
+                    "${workspaceFolder}/esp32/sender/include",
+                    "${workspaceFolder}/protocol",
+                    "/mnt/c/Users/Allaoui/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/cores/esp32",
+                    "/mnt/c/Users/Allaoui/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/variants/esp32c3",
+                    "/mnt/c/Users/Allaoui/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/libraries",
+                    "/mnt/c/Users/Allaoui/AppData/Local/Arduino15/packages/esp32/tools/esp32c3-libs/3.3.11/include"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
         }
     ],
     "version": 4,

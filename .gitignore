@@ -19,3 +19,6 @@
 **/.vscode/
 !/.vscode/
 !/.vscode/**
+
+# esp32 intellisense build folder
+esp32/intellisense-build

@@ -19,7 +19,7 @@ namespace openflash
           public:
             packet_stream_parser();
             void reset();
-            bn::optional<protocol> push_packet(const uint8_t &byte);
+            bool push_packet(const uint8_t &byte, protocol &protocol_);
         };
     }
 }

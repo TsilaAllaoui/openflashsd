@@ -15,7 +15,7 @@ namespace openflash
             _buffer.clear();
         }
 
-        bn::optional<protocol> packet_stream_parser::push_packet(const uint8_t &byte)
+        bool packet_stream_parser::push_packet(const uint8_t &byte, protocol &protocol_)
         {
             _buffer.emplace_back(byte);
 
@@ -27,10 +27,10 @@ namespace openflash
                 }
 
                 if (_buffer.empty())
-                    return bn::nullopt;
+                    return false;
 
                 if (_buffer.size() == 1)
-                    return bn::nullopt;
+                    return false;
 
                 if (_buffer[1] != magic_1)
                 {
@@ -39,7 +39,7 @@ namespace openflash
                 }
 
                 if (static_cast<size_t>(_buffer.size()) < header_size)
-                    return bn::nullopt;
+                    return false;
 
                 if (_buffer[2] != current_protocol_version)
                 {
@@ -58,20 +58,19 @@ namespace openflash
                 size_t expected_size = header_size + payload_size + crc_size;
 
                 if (static_cast<size_t>(_buffer.size()) < expected_size)
-                    return bn::nullopt;
+                    return false;
 
-                protocol protocol_;
                 auto result = decode_packet(_buffer.data(), expected_size, protocol_);
 
                 if (result)
                 {
                     _buffer.erase(_buffer.begin(), _buffer.begin() + expected_size);
                     _buffer.clear();
-                    return protocol_;
+                    return true;
                 }
 
                 _buffer.erase(_buffer.begin());
-                return bn::nullopt;
+                return false;
             }
         }
     }

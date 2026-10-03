@@ -17,5 +17,6 @@
     },
     "C_Cpp.formatting": "clangFormat",
     "C_Cpp.clang_format_style": "file",
-    "C_Cpp.clang_format_fallbackStyle": "LLVM"
+    "C_Cpp.clang_format_fallbackStyle": "LLVM",
+    "C_Cpp.default.compilerPath": "/opt/devkitpro/devkitARM/bin/arm-none-eabi-g++"
 }
