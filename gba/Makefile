@@ -58,7 +58,7 @@ USERCXXFLAGS += -DUSEMOCK
 endif
 
 ifeq ($(OPENFLASH_DEBUG),1)
-USERFLAGS    := -Os -g3 -fno-omit-frame-pointer
+USERFLAGS    := -Og -g3 -fno-omit-frame-pointer
 USERLDFLAGS  :=
 USERCXXFLAGS += -DBN_CFG_LOG_ENABLED=true -DBN_CFG_ASSERT_ENABLED=true
 else

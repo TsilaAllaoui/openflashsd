@@ -5,6 +5,17 @@
             "label": "GBA: Build",
             "type": "shell",
             "command": "${workspaceFolder}/tools/build_gba.sh",
+            "args": [
+                // "--maps" if builiding maps
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "OPENFLASH_DEBUG": "0",
+                    "OPENFLASH_LUA": "0",
+                    "OPENFLASH_MOCK": "1"
+                }
+            },
             "problemMatcher": [
                 "$gcc"
             ],
@@ -14,38 +25,45 @@
             }
         },
         {
-            "label": "GBA: Generate maps + Build",
+            "label": "GBA: Build Debug Lua",
             "type": "shell",
             "command": "${workspaceFolder}/tools/build_gba.sh",
             "args": [
-                "--maps"
+                // "--maps" if builiding maps
             ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "OPENFLASH_DEBUG": "1",
+                    "OPENFLASH_LUA": "1",
+                    "OPENFLASH_MOCK": "0"
+                }
+            },
             "problemMatcher": [
                 "$gcc"
             ]
         },
         {
-            "label": "GBA: Build + Run",
+            "label": "GBA: Start mGBA GDB Lua",
             "type": "shell",
-            "command": "${workspaceFolder}/tools/build_gba.sh",
+            "command": "bash",
             "args": [
-                "--run"
+                "-lc",
+                "nohup mgba-qt -2 -g --script \"${workspaceFolder}/gba/build/uart_runtime.lua\" \"${workspaceFolder}/gba/gba.gba\" > /tmp/openflash-mgba-gdb.log 2>&1 & sleep 1"
             ],
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
         },
         {
-            "label": "GBA: Generate maps + Build + Run",
-            "type": "shell",
-            "command": "${workspaceFolder}/tools/build_gba.sh",
-            "args": [
-                "--maps",
-                "--run"
+            "label": "GBA: Prepare Debug Lua GDB",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "GBA: Build Debug Lua",
+                "GBA: Start mGBA GDB Lua"
             ],
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": []
         }
     ]
 }

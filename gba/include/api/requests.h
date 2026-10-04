@@ -3,19 +3,22 @@
 
 namespace openflash
 {
-    enum class request_status
+    namespace gba
     {
-        PENDING,
-        IDLE,
-        RECENTLY_CHANGED
-    };
-    
-    enum class confirmation_request_status
-    {
-        PENDING,
-        NEGATIVE,
-        POSITIVE
-    };
+        enum class request_status
+        {
+            PENDING,
+            IDLE,
+            RECENTLY_CHANGED
+        };
+
+        enum class confirmation_request_status
+        {
+            PENDING,
+            NEGATIVE,
+            POSITIVE
+        };
+    }
 }
 
 #endif // REQUESTS_H

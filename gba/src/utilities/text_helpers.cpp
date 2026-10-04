@@ -2,137 +2,111 @@
 
 #include "bn_algorithm.h"
 
-namespace openflash::text_helpers
+namespace openflash
 {
-    void draw_left(
-        bn::sprite_text_generator &text_generator,
-        bn::string_view text,
-        int x,
-        int y,
-        bn::ivector<bn::sprite_ptr> &text_sprites)
+    namespace gba
     {
-        text_generator.set_left_alignment();
-
-        text_generator.generate(
-            x,
-            y,
-            text,
-            text_sprites);
-    }
-
-    void draw_centered(
-        bn::sprite_text_generator &text_generator,
-        bn::string_view text,
-        int y,
-        bn::ivector<bn::sprite_ptr> &text_sprites)
-    {
-        text_generator.set_center_alignment();
-
-        text_generator.generate(
-            0,
-            y,
-            text,
-            text_sprites);
-    }
-
-    void draw_centered_at(
-        bn::sprite_text_generator &text_generator,
-        bn::string_view text,
-        int center_x,
-        int y,
-        bn::ivector<bn::sprite_ptr> &text_sprites)
-    {
-        text_generator.set_center_alignment();
-
-        text_generator.generate(
-            center_x,
-            y,
-            text,
-            text_sprites);
-    }
-
-    void draw_right(
-        bn::sprite_text_generator &text_generator,
-        bn::string_view text,
-        int x,
-        int y,
-        bn::ivector<bn::sprite_ptr> &text_sprites)
-    {
-        text_generator.set_right_alignment();
-
-        text_generator.generate(
-            x,
-            y,
-            text,
-            text_sprites);
-    }
-
-    bn::string<64> truncate_text(
-        bn::string_view text,
-        int max_characters)
-    {
-        bn::string<64> result;
-
-        int limit = bn::min(max_characters, 64);
-
-        if (text.size() <= limit)
+        namespace text_helpers
         {
-            result = text;
-            return result;
-        }
-
-        if (limit <= 3)
-        {
-            for (int index = 0; index < limit; ++index)
+            void draw_left(bn::sprite_text_generator &text_generator,
+                           bn::string_view text,
+                           int x,
+                           int y,
+                           bn::ivector<bn::sprite_ptr> &text_sprites)
             {
-                result.push_back('.');
+                text_generator.set_left_alignment();
+
+                text_generator.generate(x, y, text, text_sprites);
             }
 
-            return result;
+            void draw_centered(bn::sprite_text_generator &text_generator,
+                               bn::string_view text,
+                               int y,
+                               bn::ivector<bn::sprite_ptr> &text_sprites)
+            {
+                text_generator.set_center_alignment();
+
+                text_generator.generate(0, y, text, text_sprites);
+            }
+
+            void draw_centered_at(bn::sprite_text_generator &text_generator,
+                                  bn::string_view text,
+                                  int center_x,
+                                  int y,
+                                  bn::ivector<bn::sprite_ptr> &text_sprites)
+            {
+                text_generator.set_center_alignment();
+
+                text_generator.generate(center_x, y, text, text_sprites);
+            }
+
+            void draw_right(bn::sprite_text_generator &text_generator,
+                            bn::string_view text,
+                            int x,
+                            int y,
+                            bn::ivector<bn::sprite_ptr> &text_sprites)
+            {
+                text_generator.set_right_alignment();
+
+                text_generator.generate(x, y, text, text_sprites);
+            }
+
+            bn::string<64> truncate_text(bn::string_view text, int max_characters)
+            {
+                bn::string<64> result;
+
+                int limit = bn::min(max_characters, 64);
+
+                if (text.size() <= limit)
+                {
+                    result = text;
+                    return result;
+                }
+
+                if (limit <= 3)
+                {
+                    for (int index = 0; index < limit; ++index)
+                    {
+                        result.push_back('.');
+                    }
+
+                    return result;
+                }
+
+                for (int index = 0; index < limit - 3; ++index)
+                {
+                    result.push_back(text[index]);
+                }
+
+                result += "...";
+
+                return result;
+            }
+
+            void draw_label_value(bn::sprite_text_generator &text_generator,
+                                  bn::string_view label,
+                                  bn::string_view value,
+                                  int left_x,
+                                  int right_x,
+                                  int y,
+                                  bn::ivector<bn::sprite_ptr> &text_sprites,
+                                  int min_spacing)
+            {
+                const int label_width = text_generator.width(label);
+                const int value_width = text_generator.width(value);
+
+                const int label_end = left_x + label_width;
+                const int value_start = right_x - value_width;
+
+                text_generator.set_left_alignment();
+                text_generator.generate(left_x, y, label, text_sprites);
+
+                if (value_start >= label_end + min_spacing)
+                {
+                    text_generator.set_right_alignment();
+                    text_generator.generate(right_x, y, value, text_sprites);
+                }
+            }
         }
-
-        for (int index = 0; index < limit - 3; ++index)
-        {
-            result.push_back(text[index]);
-        }
-
-        result += "...";
-
-        return result;
     }
-
-    void draw_label_value(
-        bn::sprite_text_generator &text_generator,
-        bn::string_view label,
-        bn::string_view value,
-        int left_x,
-        int right_x,
-        int y,
-        bn::ivector<bn::sprite_ptr> &text_sprites,
-        int min_spacing)
-    {
-        const int label_width = text_generator.width(label);
-        const int value_width = text_generator.width(value);
-
-        const int label_end = left_x + label_width;
-        const int value_start = right_x - value_width;
-
-        text_generator.set_left_alignment();
-        text_generator.generate(
-            left_x,
-            y,
-            label,
-            text_sprites);
-
-        if (value_start >= label_end + min_spacing)
-        {
-            text_generator.set_right_alignment();
-            text_generator.generate(
-                right_x,
-                y,
-                value,
-                text_sprites);
-        }
-    }
-
 }

@@ -6,16 +6,18 @@
 
 namespace openflash
 {
-    namespace api
+    namespace gba
     {
-        class process_info_api
+        namespace api
         {
-        private:
-            process_info_api();
+            class process_info_api
+            {
+            private:
+                process_info_api();
 
-            bn::optional<process_infos> _current_process_infos;
-            bool _loading;
-            bool _response_ready;
+                bn::optional<process_infos> _current_process_infos;
+                bool _loading;
+                bool _response_ready;
 #ifdef USEMOCK
             int _mock_frames;
 #endif
@@ -29,7 +31,8 @@ namespace openflash
             bool response_available() const;
             const process_infos &get_process_infos_response() const;
             void request_process_infos_reset();
-        };
+            };
+        }
     }
 }
 

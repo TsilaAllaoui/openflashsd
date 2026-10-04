@@ -12,29 +12,33 @@
 
 namespace openflash
 {
-    class main_menu_bg_scene : public i_scene
+    namespace gba
     {
-    private:
-        bn::string_view _title;
-        scene_type _type;
-        bn::optional<bn::regular_bg_ptr> _background;
-        selector _selector;
-        bn::sprite_text_generator _text_generator_8x16;
-        bn::sprite_text_generator _text_generator_8x8;
-        bn::vector<bn::sprite_ptr, 32> _text_sprites;
-        int _current_menu_index;
-        bool _pending_cart_infos_request;
-        bn::optional<pop_up> _popup;
-    public:
-        main_menu_bg_scene();
-        virtual ~main_menu_bg_scene() = default;
-        virtual void enter();
-        virtual void exit();
-        virtual void update();
-        virtual void render();
-        virtual scene_type get_scene_type();
-        virtual void set_title(const bn::string_view& title);
-    };
+        class main_menu_bg_scene : public i_scene
+        {
+        private:
+            bn::string_view _title;
+            scene_type _type;
+            bn::optional<bn::regular_bg_ptr> _background;
+            selector _selector;
+            bn::sprite_text_generator _text_generator_8x16;
+            bn::sprite_text_generator _text_generator_8x8;
+            bn::vector<bn::sprite_ptr, 32> _text_sprites;
+            int _current_menu_index;
+            bool _pending_cart_infos_request;
+            bn::optional<pop_up> _popup;
+
+        public:
+            main_menu_bg_scene();
+            virtual ~main_menu_bg_scene() = default;
+            virtual void enter();
+            virtual void exit();
+            virtual void update();
+            virtual void render();
+            virtual scene_type get_scene_type();
+            virtual void set_title(const bn::string_view &title);
+        };
+    }
 }
 
 #endif // MAIN_MENU_SCENE_H

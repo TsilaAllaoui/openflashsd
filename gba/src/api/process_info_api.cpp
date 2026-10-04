@@ -7,8 +7,10 @@
 
 namespace openflash
 {
-    namespace api
+    namespace gba
     {
+        namespace api
+        {
 #ifdef USEMOCK
         namespace
         {
@@ -113,6 +115,7 @@ namespace openflash
             _loading = false;
             _response_ready = false;
             _current_process_infos.reset();
+        }
         }
     }
 }

@@ -9,31 +9,34 @@
 
 namespace openflash
 {
-    class flash_context
+    namespace gba
     {
-    private:
-        flash_context();
+        class flash_context
+        {
+        private:
+            flash_context();
 
-        bn::optional<rom_infos> _current_rom_infos;
-        bn::optional<cart_infos> _current_cart_infos;
-        bn::optional<file_type> _current_file_filter;
-        bn::optional<save_infos> _current_save_infos;
-        bn::optional<process_type> _current_process_type;
+            bn::optional<rom_infos> _current_rom_infos;
+            bn::optional<cart_infos> _current_cart_infos;
+            bn::optional<file_type> _current_file_filter;
+            bn::optional<save_infos> _current_save_infos;
+            bn::optional<process_type> _current_process_type;
 
-    public:
-        ~flash_context() = default;
-        static flash_context &instance();
-        void set_current_rom_infos(const rom_infos &infos);
-        bn::optional<rom_infos> get_current_rom_infos();
-        void set_current_cart_infos(const cart_infos &infos);
-        bn::optional<cart_infos> get_current_cart_infos();
-        void set_current_file_filter(const bn::optional<file_type> &type);
-        bn::optional<file_type> get_current_file_filter();
-        void set_current_save_infos(const save_infos &infos);
-        bn::optional<save_infos> get_current_save_infos();
-        void set_requested_process_type(const process_type &type);
-        bn::optional<process_type> get_requested_process_type();
-    };
+        public:
+            ~flash_context() = default;
+            static flash_context &instance();
+            void set_current_rom_infos(const rom_infos &infos);
+            bn::optional<rom_infos> get_current_rom_infos();
+            void set_current_cart_infos(const cart_infos &infos);
+            bn::optional<cart_infos> get_current_cart_infos();
+            void set_current_file_filter(const bn::optional<file_type> &type);
+            bn::optional<file_type> get_current_file_filter();
+            void set_current_save_infos(const save_infos &infos);
+            bn::optional<save_infos> get_current_save_infos();
+            void set_requested_process_type(const process_type &type);
+            bn::optional<process_type> get_requested_process_type();
+        };
+    }
 }
 
-#endif // FLASH_CONTEXT_H
+#endif // FLASH_CONTEXT_Hds

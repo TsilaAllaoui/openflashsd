@@ -7,20 +7,23 @@
 
 namespace openflash
 {
-    namespace api
+    namespace gba
     {
-        class rom_info_api
+        namespace api
         {
-        private:
-            rom_info_api() = default;
+            class rom_info_api
+            {
+            private:
+                rom_info_api() = default;
 
-            bn::optional<rom_infos> _current_rom_infos;
+                bn::optional<rom_infos> _current_rom_infos;
 
-        public:
-            ~rom_info_api() = default;
-            static rom_info_api &instance();
-            bn::optional<rom_infos> get_current_rom_infos(const file_entry& file);
-        };
+            public:
+                ~rom_info_api() = default;
+                static rom_info_api &instance();
+                bn::optional<rom_infos> get_current_rom_infos(const file_entry &file);
+            };
+        }
     }
 }
 

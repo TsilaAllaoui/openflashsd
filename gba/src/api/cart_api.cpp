@@ -8,8 +8,10 @@
 
 namespace openflash
 {
-    namespace api
+    namespace gba
     {
+        namespace api
+        {
 #ifdef USEMOCK
         namespace
         {
@@ -81,6 +83,7 @@ namespace openflash
                 BN_ERROR("Cart infos is nullopt");
 
             return *_current_cart_infos;
+        }
         }
     }
 }

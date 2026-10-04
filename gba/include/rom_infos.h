@@ -9,16 +9,19 @@
 
 namespace openflash
 {
-    struct rom_infos
+    namespace gba
     {
-        bn::string<max_file_patch_character> file_path;
-        bn::string<12> name;
-        bn::string<4> game_code;
-        bn::string<2> maker_code;
-        uint8_t complement_checksum;
-        bool header_valid;
-        save_type savetype;
-    };
+        struct rom_infos
+        {
+            bn::string<max_file_path_character> file_path;
+            bn::string<12> name;
+            bn::string<4> game_code;
+            bn::string<2> maker_code;
+            uint8_t complement_checksum;
+            bool header_valid;
+            save_type savetype;
+        };
+    }
 }
 
 #endif // ROM_INFOS_H

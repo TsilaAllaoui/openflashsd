@@ -14,23 +14,26 @@
 
 namespace openflash
 {
-    class selector : public i_pop_up
+    namespace gba
     {
-    private:
-        bn::sprite_text_generator _text_generator;
-        bn::vector<bn::sprite_ptr, 32> _text_sprites;
-        bn::optional<bn::regular_bg_ptr> _selector_bg;
-        bn::optional<bn::regular_bg_map_ptr> _bg_map;
-        selector *_instance;
+        class selector : public i_pop_up
+        {
+        private:
+            bn::sprite_text_generator _text_generator;
+            bn::vector<bn::sprite_ptr, 32> _text_sprites;
+            bn::optional<bn::regular_bg_ptr> _selector_bg;
+            bn::optional<bn::regular_bg_map_ptr> _bg_map;
+            selector *_instance;
 
-    public:
-        selector();
-        virtual ~selector() = default;
-        virtual void render();
-        virtual void update();
-        virtual void dismiss();
-        void update_position(int index);
-    };
+        public:
+            selector();
+            virtual ~selector() = default;
+            virtual void render();
+            virtual void update();
+            virtual void dismiss();
+            void update_position(int index);
+        };
+    }
 }
 
 #endif // SELECTOR_H

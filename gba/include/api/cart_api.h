@@ -6,14 +6,16 @@
 
 namespace openflash
 {
-    namespace api
+    namespace gba
     {
-        class cart_api
+        namespace api
         {
-        private:
-            bn::optional<cart_infos> _current_cart_infos;
-            bool _loading;
-            bool _response_ready;
+            class cart_api
+            {
+            private:
+                bn::optional<cart_infos> _current_cart_infos;
+                bool _loading;
+                bool _response_ready;
 #ifdef USEMOCK
             int _mock_frames;
 #endif
@@ -27,7 +29,8 @@ namespace openflash
             void update();
             bool response_available() const;
             const cart_infos &get_cart_infos_response() const;
-        };
+            };
+        }
     }
 }
 

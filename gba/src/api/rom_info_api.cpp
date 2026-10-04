@@ -6,16 +6,18 @@
 
 namespace openflash
 {
-    namespace api
+    namespace gba
     {
-        rom_info_api &rom_info_api::instance()
+        namespace api
         {
-            static rom_info_api api;
-            return api;
-        }
+            rom_info_api &rom_info_api::instance()
+            {
+                static rom_info_api api;
+                return api;
+            }
 
-        bn::optional<rom_infos> rom_info_api::get_current_rom_infos(const file_entry &file)
-        {
+            bn::optional<rom_infos> rom_info_api::get_current_rom_infos(const file_entry &file)
+            {
 #ifdef USEMOCK
             auto header = mock::get_gba_header(file.path);
             auto infos = mock::get_gba_file_info(header.data());
@@ -27,6 +29,7 @@ namespace openflash
             // Request ROM information from ESP32 here.
 #endif
             return _current_rom_infos;
+            }
         }
     }
 }
