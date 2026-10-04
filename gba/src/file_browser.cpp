@@ -27,7 +27,6 @@ namespace openflash
             _text_generator(common::variable_8x16_sprite_font),
             _text_sprites(bn::vector<bn::sprite_ptr, max_file_count>()),
             _cursor_sprite(bn::sprite_items::cursor.create_sprite(screen_left + 12, file_y)),
-            _current_file_indices(),
             _icons(bn::vector<bn::sprite_ptr, max_file_count_pagination>()),
             _pop_up(),
             _browser_state(),
@@ -52,7 +51,6 @@ namespace openflash
 
         void file_browser::request_files(const bn::string_view &path)
         {
-            _current_file_indices.clear();
             _browser_state.need_update = true;
             _cursor_sprite.set_visible(false);
             api::filesystem_api::instance().request_files(_file_filter, path);
@@ -66,8 +64,8 @@ namespace openflash
             if (!filesystem.response_available())
                 return true;
 
-            update_current_files();
-            _cursor_sprite.set_visible(!_current_file_indices.empty());
+            const auto &files = api::filesystem_api::instance().get_files_response();
+            _cursor_sprite.set_visible(!files.empty());
             _browser_state.need_update = true;
 
             return false;
@@ -87,7 +85,9 @@ namespace openflash
             _text_sprites.clear();
             _icons.clear();
 
-            if (_current_file_indices.empty())
+            const auto &files = api::filesystem_api::instance().get_files_response();
+
+            if (files.empty())
             {
                 _browser_state.current_file_index = 0;
                 _cursor_sprite.set_visible(false);
@@ -106,15 +106,15 @@ namespace openflash
             if (_browser_state.current_file_index < 0)
                 _browser_state.current_file_index = 0;
 
-            if (_browser_state.current_file_index >= _current_file_indices.size())
-                _browser_state.current_file_index = _current_file_indices.size() - 1;
+            if (_browser_state.current_file_index >= files.size())
+                _browser_state.current_file_index = files.size() - 1;
 
             const auto &selected_file = current_file(_browser_state.current_file_index);
             const auto selected_name = selected_file.name();
 
             int lowerBoundary = (_browser_state.current_file_index / max_file_count_pagination)
                                 * max_file_count_pagination;
-            int upperBoundary = bn::min(lowerBoundary + max_file_count_pagination, _current_file_indices.size());
+            int upperBoundary = bn::min(lowerBoundary + max_file_count_pagination, files.size());
 
             text_helpers::draw_left(_text_generator,
                                     selected_file.path.substr(0, selected_file.path.size() - selected_name.size()),
@@ -124,7 +124,7 @@ namespace openflash
 
             text_helpers::draw_right(_text_generator,
                                      bn::to_string<16>(_browser_state.current_file_index + 1) + "/"
-                                         + bn::to_string<16>(_current_file_indices.size()),
+                                         + bn::to_string<16>(files.size()),
                                      bn::display::width() / 3 + 20,
                                      screen_top + 30,
                                      _text_sprites);
@@ -196,7 +196,8 @@ namespace openflash
                 if (!_pop_up->is_open())
                 {
                     _pop_up.reset();
-                    _cursor_sprite.set_visible(!_current_file_indices.empty());
+                    const auto &files = api::filesystem_api::instance().get_files_response();
+                    _cursor_sprite.set_visible(!files.empty());
                 }
 
                 return;
@@ -219,10 +220,11 @@ namespace openflash
                 return;
             }
 
+            const auto &files = api::filesystem_api::instance().get_files_response();
+
             if (bn::keypad::down_pressed())
             {
-                if (!_current_file_indices.empty()
-                    && _browser_state.current_file_index < _current_file_indices.size() - 1)
+                if (!files.empty() && _browser_state.current_file_index < files.size() - 1)
                     _browser_state.current_file_index++;
 
                 _browser_state.need_update = true;
@@ -238,18 +240,18 @@ namespace openflash
                 render_file_list();
             }
 
-            if (!_current_file_indices.empty() && bn::keypad::right_pressed())
+            if (!files.empty() && bn::keypad::right_pressed())
             {
                 _browser_state.current_file_index += 5;
 
-                if (_browser_state.current_file_index >= _current_file_indices.size())
-                    _browser_state.current_file_index = _current_file_indices.size() - 1;
+                if (_browser_state.current_file_index >= files.size())
+                    _browser_state.current_file_index = files.size() - 1;
 
                 _browser_state.need_update = true;
                 render_file_list();
             }
 
-            if (!_current_file_indices.empty() && bn::keypad::left_pressed())
+            if (!files.empty() && bn::keypad::left_pressed())
             {
                 _browser_state.current_file_index -= 5;
 
@@ -262,7 +264,7 @@ namespace openflash
 
             if (bn::keypad::a_pressed())
             {
-                if (_current_file_indices.empty())
+                if (files.empty())
                     return;
 
                 const auto &file = current_file(_browser_state.current_file_index);
@@ -336,7 +338,8 @@ namespace openflash
 
         void file_browser::update_cursor_position()
         {
-            if (_pop_up || _current_file_indices.empty())
+            const auto &files = api::filesystem_api::instance().get_files_response();
+            if (_pop_up || files.empty())
                 return;
 
             int lowerBoundary = (_browser_state.current_file_index / max_file_count_pagination)
@@ -344,17 +347,6 @@ namespace openflash
             int visible_index = _browser_state.current_file_index - lowerBoundary;
 
             _cursor_sprite.set_y(file_y + visible_index * text_spacing_y);
-        }
-
-        void file_browser::update_current_files()
-        {
-            const auto &files = api::filesystem_api::instance().get_files_response();
-            _current_file_indices.clear();
-
-            for (int index = 0; index < files.size(); ++index)
-            {
-                _current_file_indices.push_back(static_cast<uint8_t>(index));
-            }
         }
 
         bool file_browser::restore_browser_state()
