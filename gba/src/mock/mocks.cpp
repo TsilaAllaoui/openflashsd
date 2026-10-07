@@ -1,5 +1,6 @@
 #include "mocks.h"
 
+#include "bn_common.h"
 #include "bn_vector.h"
 #include "file_entry.h"
 
@@ -9,9 +10,13 @@ namespace openflash
     {
         namespace mock
         {
+            namespace
+            {
+                BN_DATA_EWRAM bn::vector<file_entry, max_file_count> files;
+            }
+
             const bn::vector<file_entry, max_file_count> &mock_file_entries()
             {
-                static bn::vector<file_entry, max_file_count> files;
 
                 if (!files.empty())
                     return files;

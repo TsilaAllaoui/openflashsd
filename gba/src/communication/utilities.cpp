@@ -1,5 +1,6 @@
 #include <cstdint>
 
+#include "bn_common.h"
 #include "bn_string.h"
 
 #include "common.h"
@@ -14,17 +15,21 @@ namespace openflash
     {
         uint8_t sequence_number = 0;
         uint8_t received_byte = 0;
-        openflash::gba::packet_stream_parser parser;
+        BN_DATA_EWRAM openflash::gba::packet_stream_parser parser;
+
+        namespace
+        {
+            BN_DATA_EWRAM uint8_t encoded_packet_buffer[max_packet_size];
+        }
 
         void send_packet(const uint8_t *payload, uint16_t payload_size, openflash::command cmd)
         {
-            uint8_t output[max_packet_size];
             size_t encoded_size = 0;
             bool result = openflash::encode_packet(sequence_number,
                                                    cmd,
                                                    payload,
                                                    payload_size,
-                                                   output,
+                                                   encoded_packet_buffer,
                                                    openflash::max_packet_size,
                                                    encoded_size);
 
@@ -34,13 +39,17 @@ namespace openflash
             sequence_number++;
 
             for (size_t i = 0; i < encoded_size; i++)
-                openflash::gba::uart_send(output[i]);
+                openflash::gba::uart_send(encoded_packet_buffer[i]);
         }
 
         bool receive_packet(protocol &packet)
         {
-            if (openflash::gba::uart_receive(received_byte))
-                return parser.push_packet(received_byte, packet);
+            while (openflash::gba::uart_receive(received_byte))
+            {
+                if (parser.push_packet(received_byte, packet))
+                    return true;
+            }
+
             return false;
         }
 

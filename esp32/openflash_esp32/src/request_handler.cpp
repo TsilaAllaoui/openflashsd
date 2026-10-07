@@ -4,6 +4,8 @@
 #include "request_handler.h"
 #include "interfaces/rom_infos.h"
 
+#include <Arduino.h>
+
 namespace openflash
 {
     namespace esp32
@@ -117,7 +119,12 @@ namespace openflash
             size_t offset = 0;
             std::string request_path;
 
-            if (!read_string(request.payload, offset, request_path) || offset != request.payload.size())
+            Serial.print("Payload request: ");
+            for (auto &b : request.payload)
+                Serial.print(static_cast<char>(b));
+            Serial.println();
+
+            if (!read_string(request.payload, offset, request_path))
             {
                 protocol response;
                 response.protocol_version = current_protocol_version;
@@ -125,8 +132,20 @@ namespace openflash
                 response.cmd = request.cmd;
                 append_u8(response.payload, static_cast<uint8_t>(status::INVALID_PAYLOAD));
                 responses.emplace_back(response);
+
+                Serial.print("Can't read request path string");
+                Serial.println(offset);
+                for (auto &b : request.payload)
+                    Serial.print(static_cast<char>(b));
+                Serial.println();
+
                 return;
             }
+
+            Serial.print("Requested path: ");
+            for (auto &c : request_path)
+                Serial.print(static_cast<char>(c));
+            Serial.println();
 
             if (!_filesystem.ready())
             {
@@ -136,6 +155,9 @@ namespace openflash
                 response.cmd = request.cmd;
                 append_u8(response.payload, static_cast<uint8_t>(status::NOT_READY));
                 responses.emplace_back(response);
+
+                Serial.println("Filesystem not ready!");
+
                 return;
             }
 
@@ -149,8 +171,17 @@ namespace openflash
                 response.cmd = request.cmd;
                 append_u8(response.payload, static_cast<uint8_t>(status::NOT_FOUND));
                 responses.emplace_back(response);
+
+                Serial.print("Requested path: ");
+                for (auto &c : request_path)
+                    Serial.print(static_cast<char>(c));
+                Serial.println(" not found!");
+
                 return;
             }
+
+            Serial.print("Files count: ");
+            Serial.println(files.size());
 
             uint16_t file_count = 0;
             uint16_t estimated_size = 0;
@@ -202,6 +233,8 @@ namespace openflash
             response.cmd = request.cmd;
             response.payload = current_response;
             responses.emplace_back(response);
+
+            Serial.println("Success gettting files!");
         }
 
         void request_handler::handle_debug(const protocol &request, std::vector<uint8_t> &response)

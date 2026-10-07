@@ -18,12 +18,25 @@ int main()
     bn::core::init();
     uart_init();
 
-    scene_state_machine::instance().request_scene_state(scene_type::MAIN_MENU);
+    scene_state_machine::instance().request_scene_state(
+        scene_type::MAIN_MENU);
 
     while (true)
     {
         scene_state_machine::instance().update_current_scene();
         scene_state_machine::instance().render_current_scene();
+
+        if (bn::keypad::start_pressed())
+        {
+            bn::string<256> message =
+                "This is a debug text from gba tha say hello to esp32...";
+
+            openflash::gba::send_packet(
+                reinterpret_cast<const uint8_t *>(message.data()),
+                static_cast<uint16_t>(message.size()),
+                openflash::command::DEBUG);
+        }
+
         bn::core::update();
     }
 }

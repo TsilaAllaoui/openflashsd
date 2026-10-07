@@ -80,14 +80,36 @@ namespace openflash
             if (!_file_browser)
                 return;
 
+            /*
+             * If a request was already in progress when this frame started,
+             * keep the loading popup visible until the response is complete.
+             */
             if (_file_browser->files_load_pending())
             {
                 if (!_loading_popup)
-                    _loading_popup.emplace("Loading files...", false, false);
+                {
+                    set_content_priority(1);
+
+                    _loading_popup.emplace(
+                        "Loading files...",
+                        false,
+                        false);
+
+                    _loading_popup->render();
+                }
+
+                _loading_files = true;
                 return;
             }
 
-            _loading_popup.reset();
+            /*
+             * A response that completed this frame replaces the loading popup
+             * with the directory content.
+             */
+            if (_loading_popup)
+                _loading_popup.reset();
+
+            _loading_files = false;
             set_content_priority(1);
 
             bool restored = false;
@@ -98,7 +120,40 @@ namespace openflash
             if (!restored)
                 _file_browser->render_file_list();
 
+            /*
+             * A / B handling happens here.
+             *
+             * Entering a folder or going back can call request_files(), which
+             * sets file_browser::_loading_files immediately.
+             */
             _file_browser->update();
+
+            /*
+             * Important:
+             *
+             * Do not wait until the next frame to discover that navigation
+             * started a new LIST_FILES request.
+             *
+             * Small directories can respond before the next frame, which made
+             * the old "Loading files..." popup never appear at all. Render it
+             * immediately in the same frame as A/B starts the request.
+             */
+            if (_file_browser->is_files_loading())
+            {
+                set_content_priority(1);
+
+                if (!_loading_popup)
+                {
+                    _loading_popup.emplace(
+                        "Loading files...",
+                        false,
+                        false);
+
+                    _loading_popup->render();
+                }
+
+                _loading_files = true;
+            }
         }
 
         void file_brower_scene::render()

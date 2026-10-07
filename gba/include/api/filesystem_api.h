@@ -19,6 +19,8 @@ namespace openflash
                 filesystem_api();
                 ~filesystem_api() = default;
 
+                static filesystem_api _instance;
+
                 bn::vector<file_entry, max_file_count> _files;
                 bn::optional<file_type> _file_filter;
                 bool _loading;

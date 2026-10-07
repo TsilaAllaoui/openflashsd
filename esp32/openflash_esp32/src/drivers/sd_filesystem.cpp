@@ -87,10 +87,14 @@ namespace openflash
             _ready = SD.begin(SD_CS, SPI, SD_BOOTSTRAP_FREQUENCY);
 
             if (!_ready)
+            {
+                Serial.println("SD card not ready!");
                 return false;
+            }
 
             if (SD.cardType() == CARD_NONE)
             {
+                Serial.println("Unknown SD card type!");
                 _ready = false;
                 return false;
             }
@@ -108,6 +112,7 @@ namespace openflash
 
             if (!_ready || SD.cardType() == CARD_NONE)
             {
+                Serial.println("Error mounting SD card!");
                 _ready = false;
                 return false;
             }
@@ -122,6 +127,10 @@ namespace openflash
 
         bool sd_filesystem::list_directory(const std::string &path, std::vector<file_entry> &entries)
         {
+            Serial.print("Listing files in SD card in path: ");
+            for (auto &c : path)
+                Serial.print(static_cast<char>(c));
+            Serial.println();
             entries.clear();
 
             if (!_ready)
@@ -130,7 +139,13 @@ namespace openflash
             File root = SD.open(path.c_str());
 
             if (!root)
+            {
+                Serial.print("Path not found at: ");
+                for (auto &c : path)
+                    Serial.print(static_cast<char>(c));
+                Serial.println();
                 return false;
+            }
 
             if (!root.isDirectory())
             {
@@ -146,16 +161,19 @@ namespace openflash
                 if (full_path.length() == 0)
                     break;
 
-                int separator = full_path.lastIndexOf('/');
-                String file_name = separator >= 0 ? full_path.substring(separator + 1) : full_path;
+                // int separator = full_path.lastIndexOf('/');
+                // String file_name = separator >= 0 ? full_path.substring(separator + 1) : full_path;
 
                 file_entry entry;
-                entry.path = file_name.c_str();
+                entry.path = full_path.c_str();
                 entry.type = get_file_type(entry.path, is_directory);
                 entry.size =
                     0; // For now it's the bottleneck wo we will not use file size here, only in lazy loaiding or for only one file
                 entries.emplace_back(std::move(entry));
             }
+
+            Serial.print("Files found count: ");
+            Serial.println(entries.size());
 
             root.close();
             return true;

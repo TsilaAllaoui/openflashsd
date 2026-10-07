@@ -70,6 +70,11 @@ endif
 ifeq ($(OPENFLASH_LUA),1)
 USERCXXFLAGS += -DUSELUASERVER
 endif
+
+# The file browser replaces generated sprite-text pages without a blank frame.
+# Give Butano enough sprite tile item descriptors for the old and new page to
+# coexist briefly during the frame transition.
+USERFLAGS += -DBN_CFG_SPRITE_TILES_MAX_ITEMS=128
 USERLIBDIRS 	:=  
 USERLIBS    	:=  
 DEFAULTLIBS 	:=  

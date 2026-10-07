@@ -139,7 +139,15 @@ local FILE_LIST_HEADER_SIZE =
 --------------------------------------------------
 -- Mock filesystem
 --
--- Edit this table whenever you want different test files.
+-- Exact hardware captures from log(2).txt:
+--   /        : 29 entries, 592-byte payload
+--   /ROMHACK : 9 entries, 352-byte payload
+--   /gba     : 123 entries split into two packets
+--              85 entries / 4071 bytes / NOT_FINISHED_YET
+--              38 entries / 1929 bytes / OK
+--
+-- Other directories are synthetic test content because no
+-- hardware packet capture for them is available yet.
 --------------------------------------------------
 
 local MOCK_FILES =
@@ -149,90 +157,1657 @@ local MOCK_FILES =
         {
             type = FILE_TYPE_FOLDER,
             size = 0,
-            path = "/GAMES"
+            path = "/SAVESTATE"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/GBABR.CFG"
         },
         {
             type = FILE_TYPE_FOLDER,
             size = 0,
-            path = "/SAVES"
+            path = "/LOST.DIR"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/akmenu4.nds"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/_ds_menu.dat"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/GBABR_S29_Save_First_Recovery_2026-09-16.nds"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/config"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/M36BLOB"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/GBABR.nds"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/GBFLAST.LOG"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/ROMHACK"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/azul_A_M36_generic_semantic_2026-09-10.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/azul_patched.gba"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/data"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/openflash"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/PS4_FTPC00001_v1.0.8.pkg"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/saves"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/IV0000-KPBR01111_00-AAAAAAAAAAAAAAAA.pkg"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/openflash.cfg"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/app"
         },
         {
             type = FILE_TYPE_FOLDER,
             size = 0,
             path = "/gba"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/nes"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/firmware"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/GB"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/.superfw"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/System Volume Information"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/SAVEGAME"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/__rpg"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/_gba"
         }
     },
 
-    ["/GAMES"] =
+    ["/ROMHACK"] =
     {
         {
             type = FILE_TYPE_GBA,
-            size = 16777216,
-            path = "/GAMES/PokemonEmerald.gba"
+            size = 0,
+            path = "/ROMHACK/PLP_v5.gba"
         },
         {
             type = FILE_TYPE_GBA,
-            size = 16777216,
-            path = "/GAMES/PokemonRuby.gba"
+            size = 0,
+            path = "/ROMHACK/PHS_SRAM.gba"
         },
         {
             type = FILE_TYPE_GBA,
-            size = 16777216,
-            path = "/GAMES/PokemonSapphire.gba"
+            size = 0,
+            path = "/ROMHACK/AW2_SRAM.gba"
         },
         {
             type = FILE_TYPE_GBA,
-            size = 33554432,
-            path = "/GAMES/DragonBallAdvancedAdventure.gba"
+            size = 0,
+            path = "/ROMHACK/PokemonUnbound_v5.gba"
         },
         {
             type = FILE_TYPE_GBA,
-            size = 16777216,
-            path = "/GAMES/WarioLand4.gba"
-        }
-    },
-
-    ["/SAVES"] =
-    {
-        {
-            type = FILE_TYPE_SAVE,
-            size = 131072,
-            path = "/SAVES/PokemonEmerald.sav"
+            size = 0,
+            path = "/ROMHACK/aestheticred-gbc-normal-v1.2_v5.gba"
         },
         {
-            type = FILE_TYPE_SAVE,
-            size = 131072,
-            path = "/SAVES/PokemonRuby.sav"
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/ROMHACK/Fire Emblem - The White Hag.gba"
         },
         {
-            type = FILE_TYPE_SAVE,
-            size = 131072,
-            path = "/SAVES/PokemonSapphire.sav"
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/ROMHACK/Fire Emblem - Illuminated.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/ROMHACK/Fire Emblem - Vision Quest.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/ROMHACK/azul agua beta1.4ml.gba"
         }
     },
 
     ["/gba"] =
     {
         {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Dragon Ball - Advanced Adventure (U)(Ongaku).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokémon Donjon Mystère - Equipe de Secours Rouge.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokemon Ruby (E).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokemon Sapphire (E).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Spider-Man 3 (France).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Taxi 3.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/V-Rally 3 (Europe) (En,Fr,De,Es,It).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Drill Dozer (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Mario Kart - Super Circuit (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Mega Man Zero (USA, Europe).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/SA2.gba"
+        },
+        {
             type = FILE_TYPE_NORMAL,
-            size = 1234,
-            path = "/gba/readme.txt"
+            size = 0,
+            path = "/gba/GBARunner3.nds"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/gba/out.sav"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/gba/Pokemon Emerald Seaglass 3.0 (PokemonEmeraldseaglass.com).sav"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokemon - Emerald Version (USA, Europe).gba"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/gba/0378 - Fire Emblem - Sealed Sword.sav"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokemon - Emerald Version (USA, Europe).gba_dump.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/MetroidZeroMission.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/SA.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/2 Games in 1 - Castlevania Double Pack - Harmony of Dissonance & Aria of Sorrow (E) (M3).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/2 Games in 1 - Sonic Advance & Sonic Pinball Party (E) (M5).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Beyblade VForce - Ultimate Blader Jam (U).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Breath of Fire (E).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Breath of Fire II (E).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Cars (E) (M4).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Contra Advance - The Alien Wars EX (E).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Donkey Kong Country (E).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Donkey Kong Country 2 (E) (M5).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Donkey Kong Country 3 (E) (M5).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Dragon Ball Z - Buu's Fury (U).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Dragon Ball Z - The Legacy of Goku (E) (M5) [!].gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Dragon Ball Z - The Legacy of Goku II (E) (M5).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Mario vs. Donkey Kong (E) (M5).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Megaman Battle Network (E) [!].gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Megaman Battle Network 2 (E).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Megaman Battle Network 3 - Blue Version (E).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Megaman Battle Network 4 - Red Sun (E).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Megaman Battle Network 5 - Team Colonel (E).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Megaman Battle Network 6 - Cybeast Falzar (E).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Megaman Zero (U).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Megaman Zero 2 (E).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Megaman Zero 3 (E).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Megaman Zero 4 (E).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Naruto - Ninja Council (U).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Naruto - Ninja Council 2 (U).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Sword of Mana (E).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Classic NES Series - Metroid (U) (patched).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Classic NES Series - Excitebike (U) (patched).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Classic NES Series - Donkey Kong (U) (patched).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Classic NES Series - Bomberman (U) (patched).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Classic NES Series - Super Mario Bros. (U) (patched).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokémon Heart and Soul SRAM (v2.0.2).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Flappy Bird (World) (Aftermarket) (Unl).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokemon Pinball - Ruby & Sapphire (Europe) (En,Fr,De,Es,It).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Super Monkey Ball Jr. (Europe) (En,Fr,De,Es,It).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/ChuChu Rocket! (USA) (En,Ja,Fr,De,Es).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/FZERO.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokémon Heart and Soul (v2.0.2).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/2 Games in One! - Dr. Mario + Puzzle League (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/0378 - Fire Emblem - Sealed Sword.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/1840 - Metal Slug Advance (E)(TRSI).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Advance Wars Returns 3.3.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/AdvanceWarsStory1p84.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/AW2AndysAdventure2020Update.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Boktai - The Sun Is in Your Hand (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Boktai 2 - Solar Boy Django (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Dr. Mario & Panel de Pon (Japan).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Game Boy Wars Advance 1+2 (Japan).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Golden Sun - The Lost Age (USA, Europe).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Golden Sun (USA, Europe).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Harvest Moon - Friends of Mineral Town (U) [!].gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Iridion II (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Mario & Luigi - Superstar Saga (Europe) (En,Fr,De,Es,It).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Mario Party Advance (Europe) (En,Fr,De,Es,It).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Mario Party Advance (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Mother 1+2 (patched) (patched).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Mother 3 (Eng. Translation 1.1).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Naruto - Ninja Council 2 (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokemon Emerald Seaglass (SC Software).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokemon Emerald Seaglass.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokemon Liquid Crystal.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokemon Perfect Leaf Green.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokemon Pinball - Ruby & Sapphire.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokemon Seaglass.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Rhythm Tengoku (English Beta 13a).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Shantae Risky Revolution.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Yggdra Union - We'll Never Fight Alone (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Astro Boy - Omega Factor (USA) (En,Ja,Fr,De,Es,It).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/EmeraldSeaglass_v3.0.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/PocketNESMenu.gba"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/gba/Golden Sun (USA, Europe).sav"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/gba/Golden Sun - The Lost Age (USA, Europe).sav"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/gba/Donkey Kong Country (E).sav"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Legend of Zelda, The - The Minish Cap (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Mega Man Zero 2 (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Mega Man Zero 3 (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Mega Man Zero 4 (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Metal Slug Advance (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Metroid - Zero Mission (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Metroid Fusion (USA, Australia).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokemon - LeafGreen Version (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokemon Mystery Dungeon - Red Rescue Team (USA, Australia).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Sonic Advance (USA) (En,Ja).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Sonic Advance 2 (USA) (En,Ja,Fr,De,Es,It).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Sonic Advance 3 (USA) (En,Ja,Fr,De,Es,It).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Super Mario Advance (USA, Europe).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Super Mario Advance 2 - Super Mario World (USA, Australia).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Super Mario Advance 3 - Yoshi's Island (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Super Mario Advance 4 - Super Mario Bros. 3 (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Wario Land 4 (USA, Europe).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/WarioWare, Inc. - Mega Microgame$! (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Kirby & the Amazing Mirror (USA).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Kirby - Nightmare in Dream Land (USA).gba"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/gba/Mega Man Zero (USA, Europe).ss1"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/gba/Fire Emblem - The Sacred Stones (USA, Australia).sav"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/gba/Kirby & the Amazing Mirror (USA).sav"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/gba/Mega Man Zero (USA, Europe).sav"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/gba/Mega Man Zero 2 (USA).sav"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/gba/Legend of Zelda, The - The Minish Cap (USA).sav"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Fire Emblem - The Sacred Stones (USA, Australia).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Advance Wars 2 - Black Hole Rising (U).gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/gba/Pokemon Pinball - Ruby & Sapphire Plus.gba"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/gba/Pokemon Pinball - Ruby & Sapphire (U) (V1.0) [hI].sav"
+        }
+    },
+
+    ["/SAVESTATE"] =
+    {
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/SAVESTATE/slot0.sav"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/SAVESTATE/slot1.sav"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/SAVESTATE/autosave.sav"
+        }
+    },
+
+    ["/LOST.DIR"] =
+    {
+        -- Intentionally empty.
+    },
+
+    ["/config"] =
+    {
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/config/settings.ini"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/config/theme.cfg"
         },
         {
             type = FILE_TYPE_FOLDER,
             size = 0,
-            path = "/gba/test"
+            path = "/config/profiles"
         }
     },
 
-    ["/gba/test"] =
+    ["/config/profiles"] =
     {
         {
             type = FILE_TYPE_NORMAL,
-            size = 42,
-            path = "/gba/test/example.txt"
+            size = 0,
+            path = "/config/profiles/default.cfg"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/config/profiles/testing.cfg"
+        }
+    },
+
+    ["/M36BLOB"] =
+    {
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/M36BLOB/blob_000.bin"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/M36BLOB/blob_001.bin"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/M36BLOB/backup"
+        }
+    },
+
+    ["/M36BLOB/backup"] =
+    {
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/M36BLOB/backup/blob_old.bin"
+        }
+    },
+
+    ["/data"] =
+    {
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/data/cache"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/data/images"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/data/index.dat"
+        }
+    },
+
+    ["/data/cache"] =
+    {
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/data/cache/cache0.bin"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/data/cache/cache1.bin"
+        }
+    },
+
+    ["/data/images"] =
+    {
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/data/images/splash.raw"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/data/images/icons.bin"
+        }
+    },
+
+    ["/openflash"] =
+    {
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/openflash/GAMES"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/openflash/SAVES"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/openflash/EMPTY"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/openflash/openflash.cfg"
+        }
+    },
+
+    ["/openflash/GAMES"] =
+    {
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/openflash/GAMES/Pokemon Emerald.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/openflash/GAMES/Pokemon FireRed.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/openflash/GAMES/Dragon Ball Advanced Adventure.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/openflash/GAMES/WarioLand4.gba"
+        }
+    },
+
+    ["/openflash/SAVES"] =
+    {
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/openflash/SAVES/Pokemon Emerald.sav"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/openflash/SAVES/Pokemon FireRed.sav"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/openflash/SAVES/WarioLand4.sav"
+        }
+    },
+
+    ["/openflash/EMPTY"] =
+    {
+        -- Intentionally empty.
+    },
+
+    ["/saves"] =
+    {
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/saves/azul_A_M36_generic_semantic_2026-09-10.sav"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/saves/azul_patched.sav"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/saves/backup"
+        }
+    },
+
+    ["/saves/backup"] =
+    {
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/saves/backup/azul_patched_2026-09-18.sav"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/saves/backup/empty_backup.sav"
+        }
+    },
+
+    ["/app"] =
+    {
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/app/diagnostics.gba"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/app/app.dat"
+        }
+    },
+
+    ["/nes"] =
+    {
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/nes/Super Mario Bros.nes"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/nes/Mega Man 2.nes"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/nes/Kirby Adventure.nes"
+        }
+    },
+
+    ["/firmware"] =
+    {
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/firmware/firmware.bin"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/firmware/firmware_backup.bin"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/firmware/version.txt"
+        }
+    },
+
+    ["/GB"] =
+    {
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/GB/Pokemon Red.gb"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/GB/Pokemon Blue.gb"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/GB/Tetris.gb"
+        }
+    },
+
+    ["/.superfw"] =
+    {
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/.superfw/settings.dat"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/.superfw/boot.bin"
+        }
+    },
+
+    ["/System Volume Information"] =
+    {
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/System Volume Information/IndexerVolumeGuid"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/System Volume Information/WPSettings.dat"
+        }
+    },
+
+    ["/SAVEGAME"] =
+    {
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/SAVEGAME/GBA"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/SAVEGAME/NDS"
+        }
+    },
+
+    ["/SAVEGAME/GBA"] =
+    {
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/SAVEGAME/GBA/game001.sav"
+        },
+        {
+            type = FILE_TYPE_SAVE,
+            size = 0,
+            path = "/SAVEGAME/GBA/game002.sav"
+        }
+    },
+
+    ["/SAVEGAME/NDS"] =
+    {
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/SAVEGAME/NDS/akmenu4.sav"
+        }
+    },
+
+    ["/__rpg"] =
+    {
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/__rpg/icons"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/__rpg/language.dat"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/__rpg/skin.dat"
+        }
+    },
+
+    ["/__rpg/icons"] =
+    {
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/__rpg/icons/folder.bin"
+        },
+        {
+            type = FILE_TYPE_NORMAL,
+            size = 0,
+            path = "/__rpg/icons/gba.bin"
+        }
+    },
+
+    ["/_gba"] =
+    {
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/test_a.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/test_b_long_filename_for_browser_testing.gba"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/_gba/EMPTY"
+        },
+        {
+            type = FILE_TYPE_FOLDER,
+            size = 0,
+            path = "/_gba/STRESS"
+        }
+    },
+
+    ["/_gba/EMPTY"] =
+    {
+        -- Intentionally empty.
+    },
+
+    ["/_gba/STRESS"] =
+    {
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_001_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_002_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_003_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_004_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_005_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_006_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_007_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_008_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_009_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_010_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_011_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_012_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_013_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_014_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_015_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_016_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_017_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_018_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_019_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_020_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_021_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_022_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_023_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_024_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_025_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_026_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_027_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_028_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_029_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_030_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_031_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_032_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_033_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_034_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_035_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_036_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_037_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_038_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_039_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_040_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_041_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_042_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_043_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_044_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_045_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_046_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_047_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_048_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_049_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_050_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_051_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_052_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_053_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_054_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_055_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_056_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_057_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_058_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_059_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_060_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_061_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_062_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_063_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_064_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_065_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_066_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_067_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_068_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_069_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_070_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_071_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_072_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_073_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_074_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_075_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_076_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_077_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_078_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_079_with_a_long_name_for_packet_chunking.gba"
+        },
+        {
+            type = FILE_TYPE_GBA,
+            size = 0,
+            path = "/_gba/STRESS/stress_test_game_080_with_a_long_name_for_packet_chunking.gba"
         }
     }
+
 }
 
 

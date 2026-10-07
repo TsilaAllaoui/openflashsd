@@ -24,11 +24,11 @@ namespace openflash
 
         constexpr int max_file_path_character = 128;
 
-        constexpr int max_file_name_character_count = 32;
+        constexpr int max_file_name_character_count = max_file_path_character;
 
         constexpr int max_cart_character_name = 100;
 
-        constexpr int stored_path_size = 32;
+        constexpr int stored_path_size = max_file_path_character;
 
         constexpr int dump_scene_max_text_sprite_count = 100;
         constexpr int dump_scene_text_y_spacing = 14;
